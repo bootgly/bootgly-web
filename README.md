@@ -1,2 +1,2 @@
-# bootgly-web
+# Web
 Bootgly Web Bootables
