@@ -1,0 +1,30 @@
+{
+   "name": "bootgly/bootgly-web",
+   "type": "library",
+   "description": "The Bootgly Web bootable.",
+   "license": "MIT",
+   "keywords": [
+      "bootgly",
+      "php",
+      "framework",
+      "web",
+      "bootable"
+   ],
+   "authors": [
+      {
+         "name": "Rodrigo Vieira",
+         "email": "rodrigo@bootgly.com",
+         "homepage": "https://www.bootgly.com/"
+      }
+   ],
+   "autoload": {
+      "files": [
+         "./autoload.php"
+      ]
+   },
+   "require": {
+      "php": "^8.2",
+      "bootgly/bootgly": "v0.0.12-alpha"
+   },
+   "minimum-stability": "dev"
+}
