@@ -3,7 +3,7 @@
 </p>
 <h1 align="center">Bootgly Web</h1>
 <p align="center">
-  <i>Bootgly Web Platform (uses WPI interface).</i>
+  <i>Bootgly Web Platform.</i>
 </p>
 <p align="center">
   <a href="https://packagist.org/packages/bootgly/bootgly-web">
