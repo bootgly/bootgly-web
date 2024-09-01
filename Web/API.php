@@ -11,16 +11,10 @@
 namespace Web;
 
 
-use Bootgly;
-use Web;
-
-
-abstract class API
+abstract class API // TODO
 {
-   public Web $Web;
-
    // * Config
-   public bool $debugger;
+   // ...
 
    // * Data
    // ...
@@ -28,14 +22,8 @@ abstract class API
    // * Meta
    // ...
 
-   public function boot ()
+   public function autoboot ()
    {
-      $Web = &$this->Web;
-
-      if ( is_file(Bootgly::$Project . 'index.php') ) {
-         require_once Bootgly::$Project . 'index.php';
-      }
+      // TODO
    }
-   abstract public function debug ($data, string $password = '');
-   abstract public function respond ();
 }
