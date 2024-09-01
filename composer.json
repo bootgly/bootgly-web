@@ -22,7 +22,7 @@
    ],
    "autoload": {
       "files": [
-         "./autoload.php"
+         "./autoboot.php"
       ]
    },
    "require": {
