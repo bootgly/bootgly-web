@@ -11,7 +11,7 @@
 namespace Web;
 
 
-abstract class API // TODO
+class API // TODO
 {
    // * Config
    // ...
