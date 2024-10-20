@@ -15,7 +15,7 @@
   </a>
 </p>
 
-> Bootgly Web platform composed by WPI interface.
+> Bootgly Web Platform composed by WPI interface.
 
 🚧
 
