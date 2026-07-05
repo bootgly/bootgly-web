@@ -38,3 +38,13 @@ spl_autoload_register (function (string $class) {
       @include(WEB_ROOT_DIR . $file);
    }
 });
+
+// ! Resources ([a-z])
+// ...
+
+// @
+/**
+ * @var Web Web
+ */
+const Web = new Web;
+Web->autoboot();
