@@ -1,0 +1,40 @@
+#!/usr/bin/env php
+<?php
+/*
+ * --------------------------------------------------------------------------
+ * Bootgly PHP Framework
+ * Developed by Rodrigo Vieira (@rodrigoslayertech)
+ * Copyright 2023-present
+ * Licensed under MIT
+ * --------------------------------------------------------------------------
+ */
+
+define('BOOTGLY_WORKING_BASE', __DIR__);
+define('BOOTGLY_WORKING_DIR', BOOTGLY_WORKING_BASE . DIRECTORY_SEPARATOR);
+
+// @ Autoboot the Web platform first (constants + autoloader, no Bootgly dependency):
+(@include __DIR__ . '/autoboot.php');
+
+// @ Autoload Composer (if exists) or autoboot the Bootgly platform (sibling checkout):
+$booted =
+   (@include __DIR__ . '/vendor/autoload.php') ||
+   (@include __DIR__ . '/../bootgly/autoboot.php');
+
+if ($booted === false) {
+   exit(<<<STATUS
+
+   The Bootgly platform was not found.
+
+   Install it with Composer:
+   ---------------------------------------\033[1;36m
+   composer install
+   \033[0m---------------------------------------\033[5m
+   Or...\033[0m
+   checkout the `bootgly` repository as a sibling directory:
+   ---------------------------------------\033[1;36m
+   git clone https://github.com/bootgly/bootgly ../bootgly
+   \033[0m---------------------------------------
+
+
+   STATUS);
+}

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Bootgly Chat</title>
+   <link rel="icon" type="image/png" href="/favicon.png">
+   <style>
+      :root { color-scheme: light dark; --accent: #16a34a; }
+      body { font: 15px/1.5 system-ui, sans-serif; max-width: 38rem; margin: 0 auto; padding: 1rem; }
+      header { display: flex; gap: .5rem; align-items: center; }
+      header input { flex: 1; padding: .4rem .6rem; font: inherit; }
+      #log { height: 55vh; overflow-y: auto; margin: 1rem 0; padding: .5rem;
+             border: 1px solid color-mix(in srgb, currentColor 20%, transparent); border-radius: .25rem; }
+      #log p { margin: .15rem 0; }
+      #log .sys { opacity: .6; font-style: italic; }
+      #log .you { color: var(--accent); }
+      form { display: flex; gap: .5rem; }
+      form input { flex: 1; padding: .4rem .6rem; font: inherit; }
+      button { padding: .4rem .9rem; font: inherit; color: #fff; background: var(--accent);
+               border: 0; border-radius: .25rem; cursor: pointer; }
+      button:disabled { opacity: .5; cursor: default; }
+      small { opacity: .7; }
+   </style>
+</head>
+<body>
+   <header>
+      <strong>Bootgly Chat</strong>
+      <input id="url" spellcheck="false">
+      <button id="connect">Connect</button>
+   </header>
+
+   <div id="log"></div>
+
+   <form id="compose">
+      <input id="message" placeholder="Message — or /join <room>" autocomplete="off" disabled>
+      <button id="send" disabled>Send</button>
+   </form>
+   <p><small>Open this file in two tabs to chat. Send <code>/join general</code> to switch rooms.</small></p>
+
+   <script>
+      'use strict';
+
+      const $log = document.getElementById('log');
+      const $url = document.getElementById('url');
+      const $connect = document.getElementById('connect');
+      const $compose = document.getElementById('compose');
+      const $message = document.getElementById('message');
+      const $send = document.getElementById('send');
+
+      let socket = null;
+
+      // Same-port default: the WS server itself serves this page over HTTP
+      $url.value = location.protocol.startsWith('http')
+         ? `ws://${location.host}`
+         : 'ws://localhost:8085';
+
+      function print (text, kind) {
+         const p = document.createElement('p');
+         p.textContent = text;
+         if (kind) p.className = kind;
+         $log.append(p);
+         $log.scrollTop = $log.scrollHeight;
+      }
+
+      function toggle (connected) {
+         $message.disabled = !connected;
+         $send.disabled = !connected;
+         $connect.textContent = connected ? 'Disconnect' : 'Connect';
+         $url.disabled = connected;
+      }
+
+      $connect.addEventListener('click', () => {
+         if (socket !== null) {
+            socket.close();
+            return;
+         }
+
+         socket = new WebSocket($url.value);
+         socket.addEventListener('open', () => {
+            print('sys: connected', 'sys');
+            toggle(true);
+            $message.focus();
+         });
+         socket.addEventListener('message', (event) => {
+            const kind = event.data.startsWith('sys:') ? 'sys'
+                       : event.data.startsWith('you:') ? 'you'
+                       : '';
+            print(event.data, kind);
+         });
+         socket.addEventListener('close', () => {
+            print('sys: disconnected', 'sys');
+            toggle(false);
+            socket = null;
+         });
+         socket.addEventListener('error', () => {
+            print('sys: connection error', 'sys');
+         });
+      });
+
+      $compose.addEventListener('submit', (event) => {
+         event.preventDefault();
+         if (socket === null || $message.value === '') return;
+         socket.send($message.value);
+         $message.value = '';
+      });
+   </script>
+</body>
+</html>

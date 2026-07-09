@@ -8,11 +8,8 @@
  * --------------------------------------------------------------------------
  */
 
-
-use Exception;
-
-
-use Web\API;
+// Global namespace: `Exception` resolves directly (a `use` import here would
+// raise "use statement with non-compound name has no effect").
 
 
 class Web
@@ -28,7 +25,11 @@ class Web
 
 
    /**
-    * Autoboot Web workables.
+    * Autoboot the Web platform.
+    *
+    * The Web platform is a class library over `Bootgly\WPI`:
+    * Apps are booted per project by their `.project.php` signature —
+    * there are no process-wide workables to warm here.
     *
     * @return void
     *
@@ -42,14 +43,5 @@ class Web
 
       // * Metadata
       self::$booted = true;
-
-      // !
-      /** @var API $API */
-      [
-         $API
-      ] = require(__DIR__ . '/Web/autoload.php');
-
-      // @
-      $API->autoboot();
    }
 }

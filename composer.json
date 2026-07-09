@@ -8,9 +8,9 @@
       "bootgly",
       "php",
       "framework",
-
       "web",
-
+      "mvc",
+      "rest",
       "module"
    ],
    "authors": [
@@ -26,7 +26,10 @@
       ]
    },
    "require": {
-      "bootgly/bootgly": "dev-main"
+      "bootgly/bootgly": ">=0.23 <1.0 || dev-main"
+   },
+   "require-dev": {
+      "phpstan/phpstan": "^2.1"
    },
    "minimum-stability": "dev"
 }

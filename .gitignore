@@ -1,23 +1,15 @@
-# Ignore IDEs folders...
-.idea/
-# Ignore files by extension...
-*.iso
-*.log
-# Ignore locks, bin, envs...
-composer
+# Composer
+/vendor/
+/@imports/
 composer.lock
 
+# Bootgly resources (installed by `bootgly boot --resources`)
+/storage/
+/tmp/
 
-### @Bootgly ###
-
-## Global folders
-# Excluded
+# Sandbox (ideas / drafts)
 **/&
-# Versus
 **/vs
-# Metafolder (@)
-@/*
-!@/__php__/
-!@/__docker__/
 
-@imports/
+# Demo project databases + migration/seed locks (created at boot)
+projects/*/database/*.sqlite*

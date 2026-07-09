@@ -1,0 +1,37 @@
+:root {
+   color-scheme: light dark;
+   --accent: #16a34a;
+}
+
+body {
+   font: 16px/1.6 system-ui, sans-serif;
+   max-width: 42rem;
+   margin: 0 auto;
+   padding: 1rem;
+}
+
+header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding-bottom: .75rem;
+   border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+}
+
+nav a {
+   margin-left: 1rem;
+   color: var(--accent);
+   text-decoration: none;
+}
+
+main {
+   min-height: 60vh;
+   padding: 2rem 0;
+}
+
+footer {
+   padding-top: .75rem;
+   border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+   font-size: .85rem;
+   opacity: .7;
+}

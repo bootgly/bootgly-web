@@ -27,7 +27,7 @@ define('WEB_VERSION', '0.1.0-alpha');
 // -- nothing --
 
 // ! Classes ([A-Z])
-// API (Application Programming Interface)
+// Web\* (platform entities) + global Web (bootable)
 spl_autoload_register (function (string $class) {
    $paths = explode('\\', $class);
    $file = implode('/', $paths) . '.php';

@@ -11,7 +11,16 @@
 namespace Web;
 
 
-class API // TODO
+/**
+ * REST shell module root.
+ *
+ * `Web\API` groups the REST building blocks of the Web platform:
+ * controller-action dispatch (`Action`), RFC 9457 problem details
+ * (`Problem` + the `Problems` error-boundary middleware), entity
+ * transformers (`Resource`) and REST resource routing (`Routes`) —
+ * an opinionated layer over the unopinionated `Bootgly\WPI` core.
+ */
+abstract class API
 {
    // * Config
    // ...
@@ -19,11 +28,6 @@ class API // TODO
    // * Data
    // ...
 
-   // * Meta
+   // * Metadata
    // ...
-
-   public function autoboot ()
-   {
-      // TODO
-   }
 }

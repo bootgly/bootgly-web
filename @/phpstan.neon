@@ -1,0 +1,21 @@
+parameters:
+   level: 9
+   excludePaths:
+      analyse:
+         - */tests/*
+         - */projects/*
+   reportUnmatchedIgnoredErrors: false
+
+   paths:
+      - ../Web.php
+      - ../Web/
+   ignoreErrors:
+      -
+         message: '#.*BOOTGLY_PROJECT not found\.#'
+         identifier: constant.notFound
+      - identifier: property.uninitializedReadonly
+      - identifier: property.private
+      - identifier: property.protected
+      - identifier: property.readOnlyAssignNotInConstructor
+      - identifier: property.readOnlyAssignOutOfClass
+      - identifier: assign.propertyReadOnly

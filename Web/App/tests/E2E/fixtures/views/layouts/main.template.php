@@ -1,0 +1,1 @@
+<l>@yield content;</l>

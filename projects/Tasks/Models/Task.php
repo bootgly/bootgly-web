@@ -8,25 +8,24 @@
  * --------------------------------------------------------------------------
  */
 
-namespace Web;
+namespace projects\Tasks\Models;
 
 
-use Web;
+use Bootgly\ADI\Databases\SQL\Model\Column;
+use Bootgly\ADI\Databases\SQL\Model\Key;
+use Bootgly\ADI\Databases\SQL\Model\Table;
 
 
-// ?
-if ( ($this ?? null) && $this instanceof Web === false )
-   return;
+#[Table('tasks')]
+class Task
+{
+   // * Data
+   #[Key]
+   public null|int $id = null;
 
-// ! Resources ([a-z])
-require(__DIR__ . '/API/autoload.php');
+   #[Column]
+   public string $title = '';
 
-// @
-/**
- * @var API API
- */
-const API = new API;
-
-return [
-   API
-];
+   #[Column]
+   public int $done = 0;
+}
