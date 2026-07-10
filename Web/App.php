@@ -91,6 +91,9 @@ class App
     * @param null|array<Middleware> $middlewares Replaces the default middleware stack wholesale.
     * @param null|array<string> $secure TLS context options (as in `HTTP_Server_CLI::configure`).
     * @param null|array<string,Closure> $resources Extra response resources (name => provider).
+    * @param null|string $health Built-in health-check endpoint path (K8s probes),
+    *                            answered before any middleware — `'/health'` by
+    *                            default on the Web platform; `null` disables it.
     */
    public function configure (
       string $host = '0.0.0.0',
@@ -98,7 +101,8 @@ class App
       int $workers = 2,
       null|array $middlewares = null,
       null|array $secure = null,
-      null|array $resources = null
+      null|array $resources = null,
+      null|string $health = '/health'
    ): self
    {
       // !
@@ -125,6 +129,7 @@ class App
          port: $port,
          workers: $workers,
          secure: $secure,
+         health: $health,
          responseResources: $resources === [] ? null : $resources
       );
 
