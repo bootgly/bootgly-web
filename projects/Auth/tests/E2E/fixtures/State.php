@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Auth\tests\E2E\fixtures;
+namespace Auth\tests\E2E\fixtures;
 
 
 use const BOOTGLY_STORAGE_DIR;

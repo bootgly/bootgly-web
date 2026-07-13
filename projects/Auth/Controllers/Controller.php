@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Auth\Controllers;
+namespace Auth\Controllers;
 
 
 use function is_string;
@@ -23,7 +23,7 @@ use Bootgly\WPI\Nodes\HTTP_Server_CLI\Request;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\Authentication\Remember;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\CSRF;
-use projects\Auth\Mails;
+use Auth\Mails;
 use Web\App\Controller as Shell;
 
 

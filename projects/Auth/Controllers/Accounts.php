@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Auth\Controllers;
+namespace Auth\Controllers;
 
 
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Request;

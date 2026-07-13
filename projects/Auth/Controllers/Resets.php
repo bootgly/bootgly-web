@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Auth\Controllers;
+namespace Auth\Controllers;
 
 
 use function str_replace;
@@ -22,7 +22,7 @@ use Bootgly\ADI\Validators\Required;
 use Bootgly\API\Security\Tokens\Purposes;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Request;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response;
-use projects\Auth\Mails;
+use Auth\Mails;
 
 
 class Resets extends Controller

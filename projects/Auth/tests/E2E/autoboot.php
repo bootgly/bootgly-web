@@ -1,6 +1,6 @@
 <?php
 
-namespace projects\Auth\tests\E2E;
+namespace Auth\tests\E2E;
 
 
 use const BOOTGLY_STORAGE_DIR;

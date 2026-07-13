@@ -1,7 +1,7 @@
 <?php
 
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Tests\Suite\Test\Specification;
-use projects\Auth\tests\E2E\fixtures\State;
+use Auth\tests\E2E\fixtures\State;
 
 require_once __DIR__ . '/fixtures/State.php';
 

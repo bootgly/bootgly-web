@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Tasks\Controllers;
+namespace Tasks\Controllers;
 
 
 use function trim;
@@ -18,8 +18,8 @@ use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response;
 use Web\API\Problem;
 use Web\App\Controller;
 
-use projects\Tasks\Models\Task;
-use projects\Tasks\Resources\Tasks as Resource;
+use Tasks\Models\Task;
+use Tasks\Resources\Tasks as Resource;
 
 
 class Tasks extends Controller

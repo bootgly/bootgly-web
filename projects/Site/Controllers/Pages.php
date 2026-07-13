@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Site\Controllers;
+namespace Site\Controllers;
 
 
 use function in_array;

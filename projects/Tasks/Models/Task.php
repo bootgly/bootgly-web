@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Tasks\Models;
+namespace Tasks\Models;
 
 
 use Bootgly\ADI\Databases\SQL\Model\Column;

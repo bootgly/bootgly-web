@@ -31,7 +31,7 @@ use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\Authentication;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\Authentication\JWT as JWTGuard;
 use Web\API\Routes;
 
-use projects\Tasks\Controllers\Tasks;
+use Tasks\Controllers\Tasks;
 
 
 $JWT = new JWT(getenv('JWT_SECRET') ?: 'bootgly-tasks-demo-secret-not-for-production');

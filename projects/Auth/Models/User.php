@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Auth\Models;
+namespace Auth\Models;
 
 
 use Bootgly\ADI\Databases\SQL\Model\Column;

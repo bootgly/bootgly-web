@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Blog\Models;
+namespace Blog\Models;
 
 
 use Bootgly\ADI\Databases\SQL\Model\Column;

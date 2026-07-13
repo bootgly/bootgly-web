@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Auth\Controllers;
+namespace Auth\Controllers;
 
 
 use function is_string;

@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Tasks\Resources;
+namespace Tasks\Resources;
 
 
 use function is_object;

@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Auth;
+namespace Auth;
 
 
 use const BOOTGLY_STORAGE_DIR;

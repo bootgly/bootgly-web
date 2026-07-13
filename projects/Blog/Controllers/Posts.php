@@ -8,7 +8,7 @@
  * --------------------------------------------------------------------------
  */
 
-namespace projects\Blog\Controllers;
+namespace Blog\Controllers;
 
 
 use function trim;
@@ -16,7 +16,7 @@ use function trim;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Request;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\CSRF;
-use projects\Blog\Models\Post;
+use Blog\Models\Post;
 use Web\App\Controller;
 
 

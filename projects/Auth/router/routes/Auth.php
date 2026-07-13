@@ -28,12 +28,12 @@ use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\RateLimit;
 use Web\API\Action;
 use Web\App\Statics;
 
-use projects\Auth\Controllers\Accounts;
-use projects\Auth\Controllers\Passwords;
-use projects\Auth\Controllers\Registrations;
-use projects\Auth\Controllers\Resets;
-use projects\Auth\Controllers\Sessions;
-use projects\Auth\Controllers\Verifications;
+use Auth\Controllers\Accounts;
+use Auth\Controllers\Passwords;
+use Auth\Controllers\Registrations;
+use Auth\Controllers\Resets;
+use Auth\Controllers\Sessions;
+use Auth\Controllers\Verifications;
 
 
 return static function (Request $Request, Response $Response, Router $Router): Generator

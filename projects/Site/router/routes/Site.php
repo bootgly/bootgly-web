@@ -18,7 +18,7 @@ use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router;
 use Web\API\Action;
 use Web\App\Statics;
 
-use projects\Site\Controllers\Pages;
+use Site\Controllers\Pages;
 
 
 return static function (Request $Request, Response $Response, Router $Router): Generator
