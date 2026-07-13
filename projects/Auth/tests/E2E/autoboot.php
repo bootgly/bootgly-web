@@ -48,10 +48,10 @@ return new Suite(
    autoBoot: $foreign
       ? function (Suite|null $Suite = null): true {
          // ! Resolve this suite's index from the registry (append-safe).
-         $Suites = require BOOTGLY_WORKING_DIR . 'tests/@.php';
+         $Suites = require BOOTGLY_WORKING_DIR . 'tests/autoboot.php';
          $index = array_search('projects/Auth/tests/E2E/', $Suites->directories, true);
          if (is_int($index) === false) {
-            throw new RuntimeException('Auth E2E suite is not registered in tests/@.php.');
+            throw new RuntimeException('Auth E2E suite is not registered in tests/autoboot.php.');
          }
 
          // @ Re-exec in a clean process — the suite needs its own BOOTGLY_PROJECT.
