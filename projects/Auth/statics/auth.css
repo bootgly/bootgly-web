@@ -1,0 +1,126 @@
+:root {
+   color-scheme: light dark;
+   --accent: #16a34a;
+}
+
+body {
+   font: 16px/1.6 system-ui, sans-serif;
+   max-width: 42rem;
+   margin: 0 auto;
+   padding: 1rem;
+}
+
+header {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding-bottom: .75rem;
+   border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+}
+
+nav a {
+   margin-left: 1rem;
+   color: var(--accent);
+   text-decoration: none;
+}
+
+main {
+   min-height: 60vh;
+   padding: 2rem 0;
+}
+
+article {
+   margin-bottom: 1.5rem;
+}
+
+.flash {
+   padding: .5rem .75rem;
+   border-left: 3px solid var(--accent);
+   background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.meta {
+   font-size: .85rem;
+   opacity: .7;
+}
+
+form label {
+   display: block;
+   margin-bottom: .75rem;
+}
+
+form input[type="text"],
+form textarea {
+   width: 100%;
+   padding: .5rem;
+   font: inherit;
+}
+
+button {
+   padding: .5rem 1rem;
+   font: inherit;
+   color: #fff;
+   background: var(--accent);
+   border: 0;
+   border-radius: .25rem;
+   cursor: pointer;
+}
+
+.actions {
+   display: flex;
+   gap: 1rem;
+   align-items: center;
+}
+
+footer {
+   padding-top: .75rem;
+   border-top: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+   font-size: .85rem;
+   opacity: .7;
+}
+
+/* Auth demo additions */
+.errors {
+   background: color-mix(in srgb, #dc2626 12%, transparent);
+   border-left: 3px solid #dc2626;
+   padding: .5rem 1rem .5rem 2rem;
+   border-radius: .25rem;
+}
+
+.banner {
+   background: color-mix(in srgb, #d97706 12%, transparent);
+   border-left: 3px solid #d97706;
+   padding: .5rem 1rem;
+   border-radius: .25rem;
+   margin-bottom: 1.5rem;
+}
+
+.badge {
+   background: color-mix(in srgb, var(--accent) 15%, transparent);
+   color: var(--accent);
+   font-size: .8rem;
+   padding: .1rem .5rem;
+   border-radius: 1rem;
+   margin-left: .5rem;
+}
+
+.checkbox {
+   flex-direction: row;
+   align-items: center;
+   gap: .5rem;
+}
+
+form.inline {
+   display: inline;
+   margin: 0;
+}
+
+button.link {
+   background: none;
+   border: none;
+   color: var(--accent);
+   cursor: pointer;
+   font: inherit;
+   padding: 0;
+   margin-left: 1rem;
+}

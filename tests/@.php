@@ -13,5 +13,7 @@ return new Suites(
       'Web/App/',
       // ? E2E (Test-mode HTTP server over the real wire)
       'Web/App/tests/E2E/',
+      // ? Auth demo E2E (session/cookie flows over the real wire)
+      'projects/Auth/tests/E2E/',
    ]
 );

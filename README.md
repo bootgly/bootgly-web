@@ -44,6 +44,7 @@ php bootgly project create
 
 | Project | Port | Shows |
 |---------|------|-------|
+| `Auth`  | 8087 | Session/cookie authentication: registration, e-mail verification, login + remember-me, password reset/change, per-route rate limits, SQLite (zero setup) |
 | `Blog`  | 8080 | Full MVC loop: controllers, ORM models, views, Session flash + masked CSRF forms, SQLite (zero setup) |
 | `Chat`  | 8085 | Realtime rooms over the WebSocket server — the client page is served on the same port |
 | `Site`  | 8088 | Landing pages: controller-dispatched views, layouts, inline statics, no database |

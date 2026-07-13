@@ -10,11 +10,13 @@
 
 /**
  * Unified project registry — the allow-list read by `Projects::read()`.
- * Only listed paths may be started. The first WPI entry is the web SAPI default.
+ * Only listed paths may be started. The entry flagged `'default' => true`
+ * is the web SAPI default (position is readability only).
  */
 
 return [
-   'Blog' => ['interfaces' => ['WPI']],
+   'Auth' => ['interfaces' => ['WPI']],
+   'Blog' => ['interfaces' => ['WPI'], 'default' => true],
    'Chat' => ['interfaces' => ['WPI']],
    'Site' => ['interfaces' => ['WPI']],
    'Tasks' => ['interfaces' => ['WPI']],
