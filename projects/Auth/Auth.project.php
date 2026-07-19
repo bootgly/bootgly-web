@@ -18,6 +18,7 @@ use Bootgly\ADI\Databases\SQL\Schema\Runner as Migrations;
 use Bootgly\ADI\Databases\SQL\Seed\Runner as Seeds;
 use Bootgly\API\Endpoints\Server\Modes;
 use Bootgly\API\Projects\Project;
+use Bootgly\WPI\Nodes\HTTP_Server_CLI\AutoTLS;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\Authentication\Remember;
 use Bootgly\WPI\Queues;
 use Bootgly\WPI\Services\Mail;
@@ -87,7 +88,13 @@ return new Project(
          ->configure(
             port: getenv('PORT') ? (int) getenv('PORT') : 8087,
             // ! Single worker — the demo SQLite file keeps writes contention-free
-            workers: 1
+            workers: 1,
+            // ? Auto-TLS (automatic HTTPS via Let's Encrypt) — set your domain and uncomment:
+            // secure: new AutoTLS(
+            //    domains: ['example.com'],
+            //    email: 'admin@example.com',
+            //    // staging: true, // Let's Encrypt staging CA while testing
+            // ),
          )
          ->load(__DIR__ . '/router')
          ->start();

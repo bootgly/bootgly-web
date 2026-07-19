@@ -106,15 +106,15 @@ return new Project(
          ->on(Events::Disconnected, function ($Session) use (&$rooms) {
             unset($rooms[spl_object_id($Session)]);
          })
-         ->on(Events::ServerStarted, function ($WS_Server_CLI) {
+         ->on(Events::ServerAdvertised, function ($WS_Server_CLI) {
+            // @ Launch banner — fired on the process that owns the terminal
+            //   (on Daemon mode, the launcher, so it survives the detach)
             $Output = CLI->Terminal->Output;
 
-            $protocol = $WS_Server_CLI->socket ?? 'ws://';
-            $host = $WS_Server_CLI->host ?? '0.0.0.0';
-            $port = $WS_Server_CLI->port ?? 0;
-
             $Output->render('@.;@#green:✓ Bootgly Chat started@;@.;');
-            $Output->render("  Listening on @#cyan:{$protocol}{$host}:{$port}@;@.;");
+            $WS_Server_CLI->advertise();
+
+            $port = $WS_Server_CLI->port ?? 0;
             $Output->render("  @#Green:Tip:@; Open @#Black:http://localhost:{$port}@; in two browser tabs to chat.@..;");
          })
          ->on(Events::ServerStopped, function ($WS_Server_CLI) {

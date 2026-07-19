@@ -25,6 +25,7 @@ use Bootgly\ACI\Logs\Logger;
 use Bootgly\API\Endpoints\Server\Modes;
 use Bootgly\API\Workables\Server\Middleware;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI;
+use Bootgly\WPI\Nodes\HTTP_Server_CLI\AutoTLS;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Events;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response\Resources\Database as DatabaseResource;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response\Resources\KV as KVResource;
@@ -89,7 +90,8 @@ class App
     * @param int $port The port to bind.
     * @param int $workers The number of worker processes.
     * @param null|array<Middleware> $middlewares Replaces the default middleware stack wholesale.
-    * @param null|array<string> $secure TLS context options (as in `HTTP_Server_CLI::configure`).
+    * @param null|array<string>|AutoTLS $secure TLS context options, or an `AutoTLS` instance
+    *                                           for automatic HTTPS via Let's Encrypt.
     * @param null|array<string,Closure> $resources Extra response resources (name => provider).
     * @param null|string $health Built-in health-check endpoint path (K8s probes),
     *                            answered before any middleware — `'/health'` by
@@ -100,7 +102,7 @@ class App
       int $port = 8080,
       int $workers = 2,
       null|array $middlewares = null,
-      null|array $secure = null,
+      null|array|AutoTLS $secure = null,
       null|array $resources = null,
       null|string $health = '/health'
    ): self
@@ -183,21 +185,18 @@ class App
 
             yield from $handler($Request, $Response, $Router);
          })
-         ->on(Events::ServerStarted, function (HTTP_Server_CLI $Server): void {
-            // @ Banner
+         ->on(Events::ServerAdvertised, function (HTTP_Server_CLI $Server): void {
+            // @ Launch banner — fired on the process that owns the terminal
+            //   (on Daemon mode, the launcher, so it survives the detach)
             $Output = CLI->Terminal->Output;
 
-            $protocol = $Server->socket ?? 'http://';
-            $host = $Server->host ?? '0.0.0.0';
-            $port = $Server->port ?? 0;
-
             $Output->render('@.;@#green:✓ Bootgly Web App started@;@.;');
-            $Output->render("  Listening on @#cyan:{$protocol}{$host}:{$port}@;@.;");
+            $Server->advertise();
             $Output->render('  @#green:● Ready for connections@;@..;');
 
             if (defined('BOOTGLY_PROJECT') === true) {
                $project = BOOTGLY_PROJECT->folder;
-               $Output->render("@#Green:Tip:@; Use @#Black:`bootgly project stop` {$project}@; to stop the server.@..;");
+               $Output->render("@#Green:Tip:@; Use @#Black:`bootgly project {$project} stop`@; to stop the server.@..;");
             }
          })
          ->on(Events::ServerStopped, function (HTTP_Server_CLI $Server): void {

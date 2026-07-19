@@ -12,6 +12,7 @@ use function getenv;
 
 use Bootgly\API\Endpoints\Server\Modes;
 use Bootgly\API\Projects\Project;
+use Bootgly\WPI\Nodes\HTTP_Server_CLI\AutoTLS;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\RequestId;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\SecureHeaders;
 use Web\App;
@@ -39,6 +40,12 @@ return new Project(
          ->configure(
             port: getenv('PORT') ? (int) getenv('PORT') : 8088,
             workers: 2,
+            // ? Auto-TLS (automatic HTTPS via Let's Encrypt) — set your domain and uncomment:
+            // secure: new AutoTLS(
+            //    domains: ['example.com'],
+            //    email: 'admin@example.com',
+            //    // staging: true, // Let's Encrypt staging CA while testing
+            // ),
             // ! Stateless landing — no forms, so no BodyParser/CSRF needed
             middlewares: [
                new SecureHeaders,
