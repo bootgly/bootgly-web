@@ -18,7 +18,7 @@ use function str_contains;
 use function strtolower;
 
 use const Bootgly\WPI;
-use Bootgly\ABI\Data\__String\Path;
+use Bootgly\ABI\Code\__String\Path;
 use Bootgly\ABI\IO\FS\File;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Request;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response;
