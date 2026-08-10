@@ -20,7 +20,7 @@ return new Suite(
       // @ Define BOOTGLY_PROJECT — the fixture project anchors views/ for
       //   render specs and the error-page lookups of the core Catcher
       if ( !defined('BOOTGLY_PROJECT') ) {
-         $TestProject = require __DIR__ . '/fixtures/fixtures.project.php';
+         $TestProject = require __DIR__ . '/fixtures/fixtures.Project.php';
          define('BOOTGLY_PROJECT', $TestProject);
       }
 

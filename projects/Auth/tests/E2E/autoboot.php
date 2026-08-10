@@ -86,7 +86,7 @@ return new Suite(
 
          // @ Define BOOTGLY_PROJECT — anchors views/, configs/ and mails/
          if ( !defined('BOOTGLY_PROJECT') ) {
-            $Project = require "{$root}/Auth.project.php";
+            $Project = require "{$root}/Auth.Project.php";
             $Project->Configs = new Configs("{$root}/configs/");
             define('BOOTGLY_PROJECT', $Project);
          }

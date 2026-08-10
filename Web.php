@@ -28,7 +28,7 @@ class Web
     * Autoboot the Web platform.
     *
     * The Web platform is a class library over `Bootgly\WPI`:
-    * Apps are booted per project by their `.project.php` signature —
+    * Apps are booted per project by their `.Project.php` signature —
     * there are no process-wide workables to warm here.
     *
     * @return void
