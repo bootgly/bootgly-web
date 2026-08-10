@@ -31,7 +31,7 @@ return static function (Request $Request, Response $Response, Router $Router): G
    static $routes = null;
 
    $Views ??= new Views;
-   $routes ??= require dirname(__DIR__, 3) . '/router/routes/Auth.php';
+   $routes ??= require dirname(__DIR__, 3) . '/router/routes/Auth.routes.php';
 
    $Views->apply($Response);
    $Router->intercept(new SecureHeaders, new RequestId, new BodyParser, new CSRF);
