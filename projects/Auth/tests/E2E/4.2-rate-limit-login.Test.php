@@ -1,5 +1,6 @@
 <?php
 
+use Bootgly\ABI\Resources\Cache;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Tests\Suite\Test;
 use Auth\tests\E2E\fixtures\State;
 
@@ -10,6 +11,15 @@ return new Test(
 
    requests: [
       function () {
+         // ! Earlier authentication specs legitimately exercised /login.
+         //   Reset only this run's private segment before measuring the burst.
+         $Cache = new Cache([
+            'driver' => 'shared',
+            'prefix' => 'ratelimit:',
+            'segment' => State::$segment,
+         ]);
+         $Cache->clear();
+
          return State::post('/login', [
             'email' => 'ana@e2e.test',
             'password' => 'totally-wrong-0',
@@ -55,17 +65,34 @@ return new Test(
    response: require __DIR__ . '/fixtures/app.php',
 
    test: function (array $responses) {
-      $last = $responses[count($responses) - 1];
+      $Cache = new Cache([
+         'driver' => 'shared',
+         'prefix' => 'ratelimit:',
+         'segment' => State::$segment,
+      ]);
+      try {
+         $codes = array_map(
+            static fn (string $response): int => State::code($response),
+            $responses
+         );
+         $last = $responses[count($responses) - 1];
 
-      // ? The burst must end rate-limited
-      if (State::code($last) !== 429) {
-         return 'login burst did not end with 429';
-      }
-      // ?
-      if (str_contains($last, 'Retry-After:') === false) {
-         return '429 response is missing Retry-After';
-      }
+         // ? Exactly five requests pass the route policy; the sixth is blocked.
+         if ($codes !== [303, 303, 303, 303, 303, 429]) {
+            return 'login burst status sequence was ' . json_encode($codes);
+         }
+         // ?
+         if (str_contains($last, 'Retry-After:') === false) {
+            return '429 response is missing Retry-After';
+         }
 
-      return true;
+         return true;
+      }
+      finally {
+         // @ Leave the private policy segment clean even when an assertion
+         //   fails, so the final login reports its own outcome rather than a
+         //   quota exhausted by this diagnostic burst.
+         $Cache->clear();
+      }
    }
 );

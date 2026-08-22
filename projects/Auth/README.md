@@ -10,8 +10,8 @@ and the WPI guards (`Authentication\Session` + `Authentication\Remember`).
 - **E-mail verification** — single-use selector/verifier link + resend
 - **Login/logout** — session fixation defense (`Session->regenerate()`), uniform
   "Invalid credentials." failures, intended-URL redirect for guests
-- **Remember-me** — rotating trusted-device cookie with theft detection
-  (a replayed validator revokes every device of the user)
+- **Remember-me** — rotating trusted-device cookie with theft detection and a
+  fixed five-second grace window for the immediately previous validator
 - **Password reset** — anti-enumeration forgot flow, single-use reset link,
   full invalidation (pending tokens + trusted devices die with the old password)
 - **Change password** — current-password gate + other-devices sign-out
@@ -56,3 +56,23 @@ Three delivery lanes, picked by the `mail` config scope (`configs/mail/`):
 - Unverified accounts can sign in — the account page shows a banner with a
   resend button. Completing a password reset also marks the e-mail verified
   (mailbox possession proven).
+- An in-flight duplicate presenting the immediately previous remember
+  validator within five seconds is declined without authentication, cookie
+  clearing or device revocation. A later replay or any unrelated wrong
+  validator revokes every trusted device and clears the presented cookie.
+- Credential, action-token and remember-token verdicts are read from the
+  primary database even when read replicas are configured.
+
+## Upgrading the remember store
+
+The current `trusts` schema adds two nullable columns: `previous VARCHAR(64)`
+for the immediately previous validator digest and `rotated BIGINT` for its
+epoch-second rotation time. Existing installations must run both additive
+migrations before deploying the matching framework code; existing rows do not
+need a backfill.
+
+Apply and verify the migrations while old workers still run, then deploy and
+restart or drain every worker as one cohort. Do not mix old and new workers:
+old workers rotate `verifier` without refreshing `previous` and `rotated`. To
+roll back, restore the old code and drain new workers first; the nullable
+columns can remain in place or be removed afterward.

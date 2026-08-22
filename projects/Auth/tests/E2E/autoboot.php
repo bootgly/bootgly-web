@@ -14,16 +14,19 @@ use function defined;
 use function dirname;
 use function escapeshellarg;
 use function exec;
+use function getenv;
 use function getmypid;
 use function glob;
 use function implode;
 use function is_int;
 use function putenv;
+use function random_int;
 use function sys_get_temp_dir;
 use function unlink;
 use RuntimeException;
 
 use Bootgly\ABI\Resources\Cache;
+use Bootgly\ABI\Resources\Cache\Drivers\Shared;
 use Bootgly\ACI\Logs\Data\Display;
 use Bootgly\ACI\Mail\Message;
 use Bootgly\ACI\Tests\Suite;
@@ -70,11 +73,10 @@ return new Suite(
       : function (Suite|null $Suite = null): true {
          Display::show(Display::NONE);
 
-         // ! Rate-limit counters live in the machine-wide shared cache — clear
-         //   them so previous runs (or the live demo) cannot trip the specs.
-         new Cache(['driver' => 'shared', 'prefix' => 'ratelimit:'])->clear();
-
          $root = dirname(__DIR__, 2); // projects/Auth
+         $PreviousDBName = getenv('DB_NAME');
+         $PreviousAppURL = getenv('APP_URL');
+         $PreviousRateSegment = getenv('AUTH_E2E_RATE_LIMIT_SEGMENT');
 
          // ! Isolated database — the specs must never dirty the shipped demo sqlite
          $db = sys_get_temp_dir() . '/bootgly-auth-e2e-' . getmypid() . '.sqlite';
@@ -84,51 +86,92 @@ return new Suite(
          putenv("DB_NAME={$db}");
          putenv('APP_URL=http://127.0.0.1:8102');
 
-         // @ Define BOOTGLY_PROJECT — anchors views/, configs/ and mails/
-         if ( !defined('BOOTGLY_PROJECT') ) {
-            $Project = require "{$root}/Auth.Project.php";
-            $Project->Configs = new Configs("{$root}/configs/");
-            define('BOOTGLY_PROJECT', $Project);
+         $RateLimitCache = null;
+         $HTTP_Server_CLI = null;
+         $started = false;
+         try {
+            // ! A private segment isolates rate-limit counters from the live
+            //   demo and concurrent tests. The encompassing finally owns it
+            //   even when migration, seed or pretest setup fails.
+            $segment = random_int(10_000_000, 2_000_000_000);
+            putenv("AUTH_E2E_RATE_LIMIT_SEGMENT={$segment}");
+            $RateLimitCache = new Cache([
+               'driver' => 'shared',
+               'prefix' => 'ratelimit:',
+               'segment' => $segment,
+            ]);
+            $RateLimitCache->clear();
+
+            require_once __DIR__ . '/fixtures/State.php';
+            fixtures\State::$database = $db;
+            fixtures\State::$segment = $segment;
+
+            // @ Define BOOTGLY_PROJECT — anchors views/, configs/ and mails/
+            if ( !defined('BOOTGLY_PROJECT') ) {
+               $Project = require "{$root}/Auth.Project.php";
+               $Project->Configs = new Configs("{$root}/configs/");
+               define('BOOTGLY_PROJECT', $Project);
+            }
+
+            // @ Migrate + seed the temp database
+            $Database = new SQL(['driver' => 'sqlite', 'database' => $db]);
+            new Migrations($Database, "{$root}/database/migrations", "{$db}.migrations.lock")->up();
+            new Seeds($Database, "{$root}/database/seeders", "{$db}.seeders.lock")->run();
+
+            // @ Mail templates jail — the file-sink lane captures the links
+            Message::$path = "{$root}/mails/";
+
+            HTTP_Server_CLI::pretest($Suite, specs: __DIR__);
+
+            $HTTP_Server_CLI = new HTTP_Server_CLI(Mode: Modes::Test);
+            $HTTP_Server_CLI->configure(
+               host: '0.0.0.0',
+               // ? 8102 — outside 8081-8100 (core E2E) and 8098 (Web App E2E)
+               port: 8102,
+               workers: 1,
+               responseResources: ['Database' => DatabaseResource::provide("{$root}/configs/")]
+            );
+
+            // ! Mark ownership before start(): a partial fork/bind failure must
+            //   still drive the bounded process/state teardown below.
+            $started = true;
+            $HTTP_Server_CLI->start();
+            $HTTP_Server_CLI->Commands->command('test');
+
+            return true;
          }
+         finally {
+            // @ Terminate workers before removing their shared-memory segment.
+            if ($started === true && $HTTP_Server_CLI !== null) {
+               $HTTP_Server_CLI->Process->stopping = true;
+               $HTTP_Server_CLI->Process->Children->terminate();
+               $HTTP_Server_CLI->Process->State->clean();
+            }
 
-         // @ Migrate + seed the temp database
-         $Database = new SQL(['driver' => 'sqlite', 'database' => $db]);
-         new Migrations($Database, "{$root}/database/migrations", "{$db}.migrations.lock")->up();
-         new Seeds($Database, "{$root}/database/seeders", "{$db}.seeders.lock")->run();
+            if ($RateLimitCache !== null) {
+               $Driver = $RateLimitCache->Driver;
+               if ($Driver instanceof Shared) {
+                  $Driver->destroy();
+               }
+            }
+            $PreviousRateSegment === false
+               ? putenv('AUTH_E2E_RATE_LIMIT_SEGMENT')
+               : putenv("AUTH_E2E_RATE_LIMIT_SEGMENT={$PreviousRateSegment}");
+            $PreviousDBName === false
+               ? putenv('DB_NAME')
+               : putenv("DB_NAME={$PreviousDBName}");
+            $PreviousAppURL === false
+               ? putenv('APP_URL')
+               : putenv("APP_URL={$PreviousAppURL}");
 
-         // @ Mail templates jail — the file-sink lane captures the links
-         Message::$path = "{$root}/mails/";
-
-         HTTP_Server_CLI::pretest($Suite, specs: __DIR__);
-
-         $HTTP_Server_CLI = new HTTP_Server_CLI(Mode: Modes::Test);
-         $HTTP_Server_CLI->configure(
-            host: '0.0.0.0',
-            // ? 8102 — outside 8081-8100 (core E2E) and 8098 (Web App E2E)
-            port: 8102,
-            workers: 1,
-            responseResources: ['Database' => DatabaseResource::provide("{$root}/configs/")]
-         );
-
-         $HTTP_Server_CLI->start();
-
-         $HTTP_Server_CLI->Commands->command('test');
-
-         // @ Teardown: terminate workers and release state lock so the next
-         //   suite running in the same master PHP process can bind/lock cleanly.
-         $HTTP_Server_CLI->Process->stopping = true;
-         $HTTP_Server_CLI->Process->Children->terminate();
-         $HTTP_Server_CLI->Process->State->clean();
-
-         // @ Cleanup — temp database + captured sink mails
-         foreach (glob("{$db}*") ?: [] as $file) {
-            unlink($file);
+            // @ Cleanup — temp database + captured sink mails.
+            foreach (glob("{$db}*") ?: [] as $file) {
+               unlink($file);
+            }
+            foreach (glob(BOOTGLY_STORAGE_DIR . 'mails/*.eml') ?: [] as $file) {
+               unlink($file);
+            }
          }
-         foreach (glob(BOOTGLY_STORAGE_DIR . 'mails/*.eml') ?: [] as $file) {
-            unlink($file);
-         }
-
-         return true;
       },
    suiteName: __NAMESPACE__,
    // * Data
@@ -146,7 +189,8 @@ return new Suite(
          '2.2-login-wrong',
          '2.3-login-remember',
          '2.4-remember-revival',
-         '2.5-remember-replay-theft',
+         '2.5-remember-duplicate-grace',
+         '2.6-remember-aged-replay-theft',
          // Password recovery
          '3.1-forgot-form',
          '3.2-forgot-unknown',
@@ -154,9 +198,10 @@ return new Suite(
          '3.4-reset-form',
          '3.5-reset-submit',
          '3.6-remember-dead-after-reset',
-         '3.7-login-new-password',
-         // Hardening
+         // Hardening — run before the final successful login regenerates the
+         // session id and invalidates the fixture's currently masked CSRF token.
          '4.1-csrf-missing-token',
          '4.2-rate-limit-login',
+         '3.7-login-new-password',
       ]
 );

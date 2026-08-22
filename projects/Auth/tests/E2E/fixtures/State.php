@@ -40,8 +40,14 @@ final class State
    public static string $token = '';
    /** Remember cookie value — `<selector>.<validator>`. */
    public static string $remember = '';
-   /** Pre-rotation remember value kept for the theft-replay spec. */
+   /** Pre-rotation remember value kept for the grace spec. */
    public static string $stale = '';
+   /** Deliberately aged pre-rotation value kept for the theft spec. */
+   public static string $aged = '';
+   /** Isolated SQLite database used by this E2E run. */
+   public static string $database = '';
+   /** Isolated System V cache segment used by this E2E run. */
+   public static int $segment = 0;
    /** Mail-sink file count snapshot (anti-enumeration spec). */
    public static int $mails = 0;
 

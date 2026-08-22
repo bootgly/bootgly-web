@@ -9,7 +9,7 @@ return new Test(
    description: 'A request with ONLY the remember cookie revives the session and rotates the validator',
 
    request: function () {
-      // ! Keep the pre-rotation value for the theft-replay spec.
+      // ! Keep the pre-rotation value for the delayed-sibling grace spec.
       State::$stale = State::$remember;
 
       return State::get('/account', ['remember=' . State::$remember]);

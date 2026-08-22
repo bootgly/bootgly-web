@@ -16,6 +16,7 @@
  * across routes.
  */
 
+use Bootgly\ABI\Resources\Cache;
 use Bootgly\API\Security\Tokens\Trust;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Request;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response;
@@ -36,8 +37,31 @@ use Auth\Controllers\Sessions;
 use Auth\Controllers\Verifications;
 
 
-return static function (Request $Request, Response $Response, Router $Router): Generator
+// ! The native E2E suite supplies an isolated System V segment so its
+//   counters never clear or inherit the live application's shared cache.
+$segment = getenv('AUTH_E2E_RATE_LIMIT_SEGMENT');
+$segmentID = $segment === false ? 0 : (int) $segment;
+if (
+   $segment !== false
+   && (
+      ctype_digit($segment) === false
+      || $segmentID < 10_000_000
+      || $segmentID > 2_000_000_000
+   )
+) {
+   throw new RuntimeException('AUTH_E2E_RATE_LIMIT_SEGMENT is invalid.');
+}
+$RateLimitCache = $segmentID === 0
+   ? null
+   : new Cache([
+      'driver' => 'shared',
+      'prefix' => 'ratelimit:',
+      'segment' => $segmentID,
+   ]);
+
+return static function (Request $Request, Response $Response, Router $Router) use ($RateLimitCache): Generator
 {
+
    // ! Guards — Session first (cheap), Remember revival on session miss;
    //   guests get a real 303 to the sign-in page with the intended URL kept.
    $Trust = new Trust($Response->Database->Database);
@@ -61,40 +85,75 @@ return static function (Request $Request, Response $Response, Router $Router): G
    // * Registration
    yield $Router->route('/register', new Action(Registrations::class, 'create'), GET);
    yield $Router->route('/register', new Action(Registrations::class, 'create'), POST, middlewares: [
-      new RateLimit(limit: 5, window: 600, key: static fn (object $Request): string => "register:{$Request->peer}")
+      new RateLimit(
+         limit: 5,
+         window: 600,
+         key: static fn (object $Request): string => "register:{$Request->peer}",
+         Cache: $RateLimitCache
+      )
    ]);
 
    // * Session (sign in / sign out)
    yield $Router->route('/login', new Action(Sessions::class, 'create'), GET);
    yield $Router->route('/login', new Action(Sessions::class, 'create'), POST, middlewares: [
-      new RateLimit(limit: 5, window: 60, key: static fn (object $Request): string => "login:{$Request->peer}")
+      new RateLimit(
+         limit: 5,
+         window: 60,
+         key: static fn (object $Request): string => "login:{$Request->peer}",
+         Cache: $RateLimitCache
+      )
    ]);
    yield $Router->route('/logout', new Action(Sessions::class, 'delete'), POST, middlewares: [$Auth]);
 
    // * E-mail verification
    yield $Router->route('/verify/:selector<alphanum>/:verifier<alphanum>', new Action(Verifications::class, 'confirm'), GET, middlewares: [
-      new RateLimit(limit: 10, window: 60, key: static fn (object $Request): string => "verify:{$Request->peer}")
+      new RateLimit(
+         limit: 10,
+         window: 60,
+         key: static fn (object $Request): string => "verify:{$Request->peer}",
+         Cache: $RateLimitCache
+      )
    ]);
    yield $Router->route('/verify', new Action(Verifications::class, 'create'), POST, middlewares: [
       $Auth,
-      new RateLimit(limit: 3, window: 600, key: static fn (object $Request): string => "resend:{$Request->peer}")
+      new RateLimit(
+         limit: 3,
+         window: 600,
+         key: static fn (object $Request): string => "resend:{$Request->peer}",
+         Cache: $RateLimitCache
+      )
    ]);
 
    // * Password recovery
    yield $Router->route('/forgot', new Action(Resets::class, 'create'), GET);
    yield $Router->route('/forgot', new Action(Resets::class, 'create'), POST, middlewares: [
-      new RateLimit(limit: 3, window: 600, key: static fn (object $Request): string => "forgot:{$Request->peer}")
+      new RateLimit(
+         limit: 3,
+         window: 600,
+         key: static fn (object $Request): string => "forgot:{$Request->peer}",
+         Cache: $RateLimitCache
+      )
    ]);
    yield $Router->route('/reset/:selector<alphanum>/:verifier<alphanum>', new Action(Resets::class, 'edit'), GET);
    yield $Router->route('/reset/:selector<alphanum>/:verifier<alphanum>', new Action(Resets::class, 'update'), POST, middlewares: [
-      new RateLimit(limit: 5, window: 600, key: static fn (object $Request): string => "reset:{$Request->peer}")
+      new RateLimit(
+         limit: 5,
+         window: 600,
+         key: static fn (object $Request): string => "reset:{$Request->peer}",
+         Cache: $RateLimitCache
+      )
    ]);
 
    // * Password change (signed in)
    yield $Router->route('/password', new Action(Passwords::class, 'edit'), GET, middlewares: [$Auth]);
    yield $Router->route('/password', new Action(Passwords::class, 'update'), POST, middlewares: [
       $Auth,
-      new RateLimit(limit: 5, window: 60, key: static fn (object $Request): string => "password:{$Request->peer}")
+      new RateLimit(
+         limit: 5,
+         window: 60,
+         key: static fn (object $Request): string => "password:{$Request->peer}",
+         Cache: $RateLimitCache
+      )
    ]);
 
    // * Account
