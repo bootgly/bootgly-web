@@ -13,7 +13,9 @@ namespace Auth\Controllers;
 
 use function str_replace;
 use function trim;
+use RuntimeException;
 
+use Auth\Mails;
 use Bootgly\ADI\Validation;
 use Bootgly\ADI\Validators\Confirmed;
 use Bootgly\ADI\Validators\Email;
@@ -22,7 +24,6 @@ use Bootgly\ADI\Validators\Required;
 use Bootgly\API\Security\Tokens\Purposes;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Request;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response;
-use Auth\Mails;
 
 
 class Resets extends Controller
@@ -150,8 +151,11 @@ class Resets extends Controller
 
       // @ Rotate + full invalidation (core orchestration contract)
       $this->Users->rotate($user, $password);
-      $this->Tokens->revoke($user);
-      $this->Trust->revoke($user);
+      $tokens = $this->Tokens->revoke($user);
+      $trusts = $this->Trust->revoke($user);
+      if ($tokens === null || $trusts === null) {
+         throw new RuntimeException('Password reset but credential revocation failed.');
+      }
       // ! Completing a reset proves mailbox possession.
       $this->Users->confirm($user);
 

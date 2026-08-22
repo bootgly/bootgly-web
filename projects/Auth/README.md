@@ -59,9 +59,33 @@ Three delivery lanes, picked by the `mail` config scope (`configs/mail/`):
 - An in-flight duplicate presenting the immediately previous remember
   validator within five seconds is declined without authentication, cookie
   clearing or device revocation. A later replay or any unrelated wrong
-  validator revokes every trusted device and clears the presented cookie.
+  validator reports theft and clears the presented cookie only after every
+  trusted device has been successfully revoked. A recorded revocation failure
+  returns `null` instead of fabricating a theft incident.
+- Action tokens enforce `UNIQUE (user_id, purpose)` and use one atomic upsert.
+  Concurrent callers can both receive a token, but only the winning value
+  remains valid.
+- `Tokens->revoke()` and `Trust->revoke()` return the affected-row count (`0`
+  means no match) or `null` on a recorded database failure. Flows promising
+  full invalidation treat `null` as an infrastructure failure.
 - Credential, action-token and remember-token verdicts are read from the
   primary database even when read replicas are configured.
+
+## Upgrading the action-token store
+
+The `tokens` table must enforce `UNIQUE (user_id, purpose)`. Existing
+installations must run the additive
+`20260822000200_unique_tokens_user_purpose` migration before deploying the
+matching framework code. The migration keeps the greatest `id` for each
+existing pair, invalidates the other links and adds the unique index; the
+original ordinary index remains in place.
+
+Apply and verify the migration while old workers still run, then deploy the
+new code. During that interval an old worker can lose a concurrent issuance,
+but the unique index prevents duplicate live links. Pause action-token writers
+while MySQL performs the non-transactional deduplication/index transition. To
+roll back, restore and drain the old code first; remove the unique index only
+after no new worker remains.
 
 ## Upgrading the remember store
 

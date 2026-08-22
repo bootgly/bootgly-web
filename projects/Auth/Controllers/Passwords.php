@@ -11,6 +11,8 @@
 namespace Auth\Controllers;
 
 
+use RuntimeException;
+
 use Bootgly\ADI\Validation;
 use Bootgly\ADI\Validators\Confirmed;
 use Bootgly\ADI\Validators\Regex;
@@ -78,8 +80,11 @@ class Passwords extends Controller
 
       // @ Rotate + full invalidation (core orchestration contract)
       $this->Users->rotate($user, $password);
-      $this->Tokens->revoke($user);
-      $this->Trust->revoke($user);
+      $tokens = $this->Tokens->revoke($user);
+      $trusts = $this->Trust->revoke($user);
+      if ($tokens === null || $trusts === null) {
+         throw new RuntimeException('Password changed but credential revocation failed.');
+      }
       // ! Every trusted device died — including this one's cookie.
       $this->Remember->forget();
 
