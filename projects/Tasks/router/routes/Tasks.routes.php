@@ -19,8 +19,6 @@
  *        -d '{"title":"New task"}' http://localhost:8090/tasks
  */
 
-use function getenv;
-use function time;
 
 use Bootgly\API\Security\JWT;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Request;

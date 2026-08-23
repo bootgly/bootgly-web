@@ -8,7 +8,6 @@
  * --------------------------------------------------------------------------
  */
 
-use function getenv;
 
 use Bootgly\API\Endpoints\Server\Modes;
 use Bootgly\API\Projects\Project;

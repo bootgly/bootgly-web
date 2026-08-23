@@ -8,9 +8,6 @@
  * --------------------------------------------------------------------------
  */
 
-use const BOOTGLY_STORAGE_DIR;
-use function getenv;
-use function is_string;
 
 use Bootgly\ACI\Mail\Message;
 use Bootgly\ADI\Databases\SQL;

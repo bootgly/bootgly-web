@@ -8,7 +8,6 @@
  * --------------------------------------------------------------------------
  */
 
-use function time;
 
 use Bootgly\ADI\Databases\SQL;
 use Bootgly\ADI\Databases\SQL\Builder\Identifier;

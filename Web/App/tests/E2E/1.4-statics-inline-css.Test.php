@@ -1,8 +1,6 @@
 <?php
 
-use function str_contains;
 
-use const GET;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Request;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router;

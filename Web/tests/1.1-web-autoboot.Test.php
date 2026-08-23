@@ -3,9 +3,6 @@
 // Global namespace: the `Web` bootable (class + constant) lives in the
 // global namespace — a namespaced test could not reference it unqualified.
 
-use function assert;
-use function class_exists;
-use function defined;
 
 use Bootgly\ACI\Tests\Suite\Test;
 use Web\API;

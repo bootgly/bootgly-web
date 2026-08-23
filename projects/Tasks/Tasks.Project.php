@@ -8,7 +8,6 @@
  * --------------------------------------------------------------------------
  */
 
-use function getenv;
 
 use Bootgly\ADI\Databases\SQL;
 use Bootgly\ADI\Databases\SQL\Schema\Runner as Migrations;

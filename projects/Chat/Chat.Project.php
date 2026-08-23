@@ -8,12 +8,6 @@
  * --------------------------------------------------------------------------
  */
 
-use function file_get_contents;
-use function getenv;
-use function preg_replace;
-use function spl_object_id;
-use function str_starts_with;
-use function substr;
 
 use const Bootgly\CLI;
 use Bootgly\API\Endpoints\Server\Modes;
