@@ -13,19 +13,19 @@ use Bootgly\API\Projects\Project;
 
 
 // This is an example test — use it as a guide to write your own:
-// each `N.N-name.Test.php` file listed in `tests/autoboot.php` returns a
+// each `N.N-name.Test.php` file listed in `tests/project/autoboot.php` returns a
 // Test whose test generator `yield`s one `assert()` per check.
 return new Test(
    description: 'Project signature: metadata contract',
    test: function () {
-      $Project = include __DIR__ . '/../Tasks.Project.php';
+      $Project = include __DIR__ . '/../../Chat.Project.php';
 
       yield assert(
          assertion: $Project instanceof Project,
          description: 'the signature file returns a Project'
       );
       yield assert(
-         assertion: $Project->name === 'Tasks',
+         assertion: $Project->name === 'Chat',
          description: 'name'
       );
       yield assert(

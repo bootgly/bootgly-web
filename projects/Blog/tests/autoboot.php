@@ -8,22 +8,21 @@
  * --------------------------------------------------------------------------
  */
 
-namespace Blog\tests;
+use Bootgly\ACI\Tests\Suites;
 
-
-use Bootgly\ACI\Tests\Suite;
-
-
-return new Suite(
-   // * Config
-   autoBoot: __DIR__,
-   autoInstance: true,
-   autoReport: true,
-   autoSummarize: true,
-   exitOnFailure: true,
-   // * Data
-   suiteName: __NAMESPACE__,
-   tests: [
-      '1.1-project-signature',
+// Blog test registry — this project's Suites.
+//
+// Each entry is a directory relative to this project's root carrying an
+// `autoboot.php` that returns a Suite (an entry already inside a `tests/`
+// folder loads that file directly):
+//   - 'tests/project/'  → tests/project/autoboot.php
+//
+// Run this project's suites with `bootgly test` from the project directory
+// (cd projects/Blog), one with `bootgly test <index>` and a single case with
+// `bootgly test <index> <case>`.
+return new Suites(
+   directories: [
+      // The project's own suite — the signature contract of Blog.Project.php:
+      'tests/project/',
    ]
 );

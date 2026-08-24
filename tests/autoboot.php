@@ -16,9 +16,9 @@ return new Suites(
       // ? Auth demo E2E (session/cookie flows over the real wire)
       'projects/Auth/tests/E2E/',
       // ! Web projects — example signature suites (kit import guide)
-      'projects/Blog/',
-      'projects/Chat/',
-      'projects/Site/',
-      'projects/Tasks/',
+      'projects/Blog/tests/project/',
+      'projects/Chat/tests/project/',
+      'projects/Site/tests/project/',
+      'projects/Tasks/tests/project/',
    ]
 );
