@@ -18,9 +18,11 @@ use function getenv;
 use function getmypid;
 use function glob;
 use function implode;
+use function is_file;
 use function is_int;
 use function putenv;
 use function random_int;
+use function str_starts_with;
 use function sys_get_temp_dir;
 use function unlink;
 use RuntimeException;
@@ -29,6 +31,7 @@ use Bootgly\ABI\Resources\Cache;
 use Bootgly\ABI\Resources\Cache\Drivers\Shared;
 use Bootgly\ACI\Logs\Data\Display;
 use Bootgly\ACI\Mail\Message;
+use Bootgly\ACI\Tests;
 use Bootgly\ACI\Tests\Suite;
 use Bootgly\ADI\Databases\SQL;
 use Bootgly\ADI\Databases\SQL\Schema\Runner as Migrations;
@@ -50,17 +53,32 @@ return new Suite(
    // * Config
    autoBoot: $foreign
       ? function (Suite|null $Suite = null): true {
-         // ! Resolve this suite's index from the registry (append-safe).
-         $Suites = require BOOTGLY_WORKING_DIR . 'tests/autoboot.php';
+         // ! Resolve this suite's index from the registry it BELONGS to —
+         //   the runner records the file it included and the scope selector
+         //   that picks it (from a kit: `Web/tests/autoboot.php` + `--web`).
+         //   Guessing it from the working directory would read the USER's
+         //   registry from a kit, which never lists a platform path (BG-9) —
+         //   and a merged `projects/` run records no single registry at all.
+         $registry = Tests::$registry;
+         // ? Only a single-registry scope can re-exec this suite
+         if ($registry === '' || is_file($registry) === false) {
+            throw new RuntimeException(
+               'Auth E2E needs a single-registry scope — run it with `bootgly test --web`.'
+            );
+         }
+         $Suites = require $registry;
          $index = array_search('projects/Auth/tests/E2E/', $Suites->directories, true);
          if (is_int($index) === false) {
-            throw new RuntimeException('Auth E2E suite is not registered in tests/autoboot.php.');
+            throw new RuntimeException("Auth E2E suite is not registered in {$registry}.");
          }
 
-         // @ Re-exec in a clean process — the suite needs its own BOOTGLY_PROJECT.
+         // @ Re-exec in a clean process — the suite needs its own
+         //   BOOTGLY_PROJECT. The recorded scope flag re-selects the same
+         //   registry; a flagless scope re-execs exactly as before.
          $bootgly = escapeshellarg(BOOTGLY_WORKING_DIR . 'bootgly');
          $suite = $index + 1;
-         exec("AI_AGENT=0 " . PHP_BINARY . " {$bootgly} test {$suite} 2>&1", $output, $exit);
+         $scope = str_starts_with(Tests::$scope, '--') === true ? Tests::$scope . ' ' : '';
+         exec("AI_AGENT=0 " . PHP_BINARY . " {$bootgly} test {$scope}{$suite} 2>&1", $output, $exit);
 
          // ?
          if ($exit !== 0) {
