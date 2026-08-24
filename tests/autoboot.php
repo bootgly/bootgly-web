@@ -14,11 +14,11 @@ return new Suites(
       // ? E2E (Test-mode HTTP server over the real wire)
       'Web/App/tests/E2E/',
       // ? Auth demo E2E (session/cookie flows over the real wire)
-      'projects/Auth/tests/E2E/',
+      'projects/Demo/Auth/tests/E2E/',
       // ! Web projects — example signature suites (kit import guide)
-      'projects/Blog/tests/project/',
-      'projects/Chat/tests/project/',
-      'projects/Site/tests/project/',
-      'projects/Tasks/tests/project/',
+      'projects/Demo/Blog/tests/project/',
+      'projects/Demo/Chat/tests/project/',
+      'projects/Demo/Site/tests/project/',
+      'projects/Demo/Tasks/tests/project/',
    ]
 );

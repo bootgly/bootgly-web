@@ -15,9 +15,9 @@
  */
 
 return [
-   'Auth' => ['interfaces' => ['WPI']],
-   'Blog' => ['interfaces' => ['WPI'], 'default' => true],
-   'Chat' => ['interfaces' => ['WPI']],
-   'Site' => ['interfaces' => ['WPI']],
-   'Tasks' => ['interfaces' => ['WPI']],
+   'Demo/Auth'  => ['interfaces' => ['WPI']],
+   'Demo/Blog'  => ['interfaces' => ['WPI'], 'default' => true],
+   'Demo/Chat'  => ['interfaces' => ['WPI']],
+   'Demo/Site'  => ['interfaces' => ['WPI']],
+   'Demo/Tasks' => ['interfaces' => ['WPI']],
 ];
