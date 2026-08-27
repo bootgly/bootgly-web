@@ -4,15 +4,21 @@ namespace Web\API;
 
 
 use function assert;
+use function count;
 use function is_string;
 use function json_decode;
 use function str_contains;
+use ReflectionProperty;
 use RuntimeException;
 
 use Bootgly\ABI\Debugging\Data\Throwables;
 use Bootgly\ACI\Tests\Suite\Test;
 use Bootgly\API\Environments;
+use Bootgly\WPI\Modules\HTTP;
+use Bootgly\WPI\Nodes\HTTP_Server_CLI\Request;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response;
+use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response\Timeout;
+use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Recovering;
 
 
 return new Test(
@@ -107,6 +113,76 @@ return new Test(
          yield assert(
             assertion: $rethrown === true,
             description: 'Development: generic throwables are rethrown to the core Catcher'
+         );
+
+         // @ Deferred work — the Recovering contract (BG-14)
+         $Live = new Request;
+         $Live->method = 'GET';
+         new ReflectionProperty(Request::class, 'URI')->setValue($Live, '/tasks/1');
+         new ReflectionProperty(Request::class, 'peer')->setValue($Live, '127.0.0.1');
+
+         yield assert(
+            assertion: $Problems instanceof Recovering,
+            description: 'Problems is a Recovering middleware'
+         );
+
+         $Returned = $Problems->recover($Live, new Response, new Problem(404, detail: 'Task 1 not found'));
+         $body = $Returned?->Body->raw;
+         $members = json_decode(is_string($body) ? $body : '', true);
+
+         yield assert(
+            assertion: $Returned !== null
+               && $Returned->code === 404
+               && $Returned->Header->get('Content-Type') === 'application/problem+json'
+               && $members['detail'] === 'Task 1 not found',
+            description: 'Deferred: a thrown Problem renders as problem+json'
+         );
+
+         $Returned = $Problems->recover($Live, new Response, new Timeout(2.5));
+         $body = $Returned?->Body->raw;
+         $members = json_decode(is_string($body) ? $body : '', true);
+
+         yield assert(
+            assertion: $Returned !== null
+               && $Returned->code === 503
+               && $Returned->Header->get('Content-Type') === 'application/problem+json'
+               && $members['status'] === 503
+               && $members['title'] === HTTP::RESPONSE_STATUS[503],
+            description: 'Deferred: the deferral budget becomes a 503 problem'
+         );
+
+         Problems::$Environment = Environments::Test;
+         $declinedTest = $Problems->recover($Live, new Response, new RuntimeException('boom'));
+         $consumedTest = Problems::$Environment === null;
+         Problems::$Environment = Environments::Development;
+         $declinedDevelopment = $Problems->recover($Live, new Response, new RuntimeException('boom'));
+
+         yield assert(
+            assertion: $declinedTest === null
+               && $consumedTest
+               && $declinedDevelopment === null
+               && Problems::$Environment === null,
+            description: 'Deferred: Development/Test decline to the core Catcher, consuming the override'
+         );
+
+         $reported = [];
+         Problems::$Environment = Environments::Production;
+         $Returned = $Problems->recover($Live, new Response, new RuntimeException('secret internals'));
+         $body = $Returned?->Body->raw;
+         $members = json_decode(is_string($body) ? $body : '', true);
+
+         yield assert(
+            assertion: $Returned !== null
+               && $Returned->code === 500
+               && $Returned->Header->get('Content-Type') === 'application/problem+json'
+               && $members['status'] === 500
+               && str_contains(is_string($body) ? $body : '', 'secret internals') === false
+               && count($reported) === 1
+               && $reported[0][0] instanceof RuntimeException
+               && $reported[0][1]['interface'] === 'WPI'
+               && $reported[0][1]['URI'] === '/tasks/1'
+               && Problems::$Environment === null,
+            description: 'Deferred: Production answers an internals-free 500 problem and reports it once'
          );
       }
       finally {

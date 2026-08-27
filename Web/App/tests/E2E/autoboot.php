@@ -57,5 +57,9 @@ return new Suite(
       // problem+json error boundary
       '2.1-problem-thrown-422',
       '2.2-problem-production-500',
+      // problem+json error boundary — deferred work (BG-14)
+      '2.3-problem-deferred-422',
+      '2.4-problem-deferred-production-500',
+      '2.5-problem-deferred-test-catcher',
    ]
 );
