@@ -15,7 +15,6 @@ use function str_replace;
 use function trim;
 use RuntimeException;
 
-use Demo\Auth\Mails;
 use Bootgly\ADI\Validation;
 use Bootgly\ADI\Validators\Confirmed;
 use Bootgly\ADI\Validators\Email;
@@ -24,6 +23,7 @@ use Bootgly\ADI\Validators\Required;
 use Bootgly\API\Security\Tokens\Purposes;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Request;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response;
+use Demo\Auth\Mails;
 
 
 class Resets extends Controller
@@ -150,7 +150,13 @@ class Resets extends Controller
       }
 
       // @ Rotate + full invalidation (core orchestration contract)
-      $this->Users->rotate($user, $password);
+      // ? A recorded database failure throws out of the store; false means the
+      //   account no longer exists — nothing rotated, so nothing may proceed
+      if ($this->Users->rotate($user, $password) === false) {
+         $this->flash($Request, 'This account no longer exists.');
+
+         return $this->redirect('/forgot', 303);
+      }
       $tokens = $this->Tokens->revoke($user);
       $trusts = $this->Trust->revoke($user);
       if ($tokens === null || $trusts === null) {

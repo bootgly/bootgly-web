@@ -79,7 +79,13 @@ class Passwords extends Controller
       }
 
       // @ Rotate + full invalidation (core orchestration contract)
-      $this->Users->rotate($user, $password);
+      // ? A recorded database failure throws out of the store; false means the
+      //   account no longer exists — nothing rotated, so nothing may proceed
+      if ($this->Users->rotate($user, $password) === false) {
+         $this->fail($Request, ['password' => ['Password could not be changed.']]);
+
+         return $this->redirect('/password', 303);
+      }
       $tokens = $this->Tokens->revoke($user);
       $trusts = $this->Trust->revoke($user);
       if ($tokens === null || $trusts === null) {
