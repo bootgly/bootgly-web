@@ -30,7 +30,7 @@ curl -fsSL https://bootgly.com/install | bash
 From the kit, the project wizard imports this platform's demo projects (**Import projects from Platforms → Web**):
 
 ```bash
-php bootgly project create
+php bootgly projects create
 ```
 
 > ⚠️ Using this repository directly is **discouraged** — `bootgly.kit` is the starting point: it is where the Bootgly core and the platforms are mounted and booted together. See [Getting started](https://docs.bootgly.com/guide/getting-started). Cloning `bootgly-web` standalone is only meant for developing the platform itself.
