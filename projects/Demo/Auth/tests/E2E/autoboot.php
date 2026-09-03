@@ -39,6 +39,8 @@ use Bootgly\ADI\Databases\SQL\Seed\Runner as Seeds;
 use Bootgly\API\Endpoints\Server\Modes;
 use Bootgly\API\Projects\Configs;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI;
+use Bootgly\WPI\Nodes\HTTP_Server_CLI\Configs as ServerConfigs;
+use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response\Configs as ResponseConfigs;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response\Resources\Database as DatabaseResource;
 
 
@@ -143,11 +145,15 @@ return new Suite(
 
             $HTTP_Server_CLI = new HTTP_Server_CLI(Mode: Modes::Test);
             $HTTP_Server_CLI->configure(
-               host: '0.0.0.0',
-               // ? 8102 — outside 8081-8100 (core E2E) and 8098 (Web App E2E)
-               port: 8102,
-               workers: 1,
-               responseResources: ['Database' => DatabaseResource::provide("{$root}/configs/")]
+               new ServerConfigs(
+                  host: '0.0.0.0',
+                  // ? 8102 — outside 8081-8100 (core E2E) and 8098 (Web App E2E)
+                  port: 8102,
+                  workers: 1
+               ),
+               new ResponseConfigs(
+                  Resources: ['Database' => DatabaseResource::provide("{$root}/configs/")]
+               )
             );
 
             // ! Mark ownership before start(): a partial fork/bind failure must

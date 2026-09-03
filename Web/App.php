@@ -26,7 +26,9 @@ use Bootgly\API\Endpoints\Server\Modes;
 use Bootgly\API\Workables\Server\Middleware;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\AutoTLS;
+use Bootgly\WPI\Nodes\HTTP_Server_CLI\Configs as ServerConfigs;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Events;
+use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response\Configs as ResponseConfigs;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response\Resources\Database as DatabaseResource;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response\Resources\KV as KVResource;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\BodyParser;
@@ -125,14 +127,27 @@ class App
          }
       }
 
+      // ! TLS source — an `AutoTLS` instance takes its own dedicated slot; a
+      //   plain array stays a manual stream-context (mutually exclusive)
+      $AutoTLS = null;
+      if ($secure instanceof AutoTLS) {
+         $AutoTLS = $secure;
+         $secure = null;
+      }
+
       // @
       $this->Server->configure(
-         host: $host,
-         port: $port,
-         workers: $workers,
-         secure: $secure,
-         health: $health,
-         responseResources: $resources === [] ? null : $resources
+         new ServerConfigs(
+            host: $host,
+            port: $port,
+            workers: $workers,
+            secure: $secure,
+            AutoTLS: $AutoTLS,
+            health: $health
+         ),
+         new ResponseConfigs(
+            Resources: $resources === [] ? null : $resources
+         )
       );
 
       // :

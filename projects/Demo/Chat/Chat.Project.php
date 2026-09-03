@@ -13,6 +13,7 @@ use const Bootgly\CLI;
 use Bootgly\API\Endpoints\Server\Modes;
 use Bootgly\API\Projects\Project;
 use Bootgly\WPI\Nodes\WS_Server_CLI;
+use Bootgly\WPI\Nodes\WS_Server_CLI\Configs;
 use Bootgly\WPI\Nodes\WS_Server_CLI\Events;
 
 
@@ -35,26 +36,28 @@ return new Project(
       });
 
       $WS_Server_CLI->configure(
-         host: '0.0.0.0',
-         port: getenv('PORT') ? (int) getenv('PORT') : 8085,
-         // ! Single worker — Channels are per-worker state
-         workers: 1,
-         heartbeatInterval: 30,
-         // ! Plain HTTP requests on the same port get the client page —
-         //   open http://localhost:8085 in the browser, no second server
-         fallback: static function (string $target): null|array {
-            return match ($target) {
-               '/', '/index.html', '/chat.html' => [
-                  'text/html; charset=UTF-8',
-                  (string) file_get_contents(__DIR__ . '/statics/chat.html')
-               ],
-               '/favicon.png' => [
-                  'image/png',
-                  (string) file_get_contents(__DIR__ . '/statics/favicon.png')
-               ],
-               default => null
-            };
-         }
+         new Configs(
+            host: '0.0.0.0',
+            port: getenv('PORT') ? (int) getenv('PORT') : 8085,
+            // ! Single worker — Channels are per-worker state
+            workers: 1,
+            heartbeatInterval: 30,
+            // ! Plain HTTP requests on the same port get the client page —
+            //   open http://localhost:8085 in the browser, no second server
+            Fallback: static function (string $target): null|array {
+               return match ($target) {
+                  '/', '/index.html', '/chat.html' => [
+                     'text/html; charset=UTF-8',
+                     (string) file_get_contents(__DIR__ . '/statics/chat.html')
+                  ],
+                  '/favicon.png' => [
+                     'image/png',
+                     (string) file_get_contents(__DIR__ . '/statics/favicon.png')
+                  ],
+                  default => null
+               };
+            }
+         )
       );
 
       // ! Per-session room map (worker-local)

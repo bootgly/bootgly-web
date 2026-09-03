@@ -10,6 +10,7 @@ use Bootgly\ACI\Logs\Data\Display;
 use Bootgly\ACI\Tests\Suite;
 use Bootgly\API\Endpoints\Server\Modes;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI;
+use Bootgly\WPI\Nodes\HTTP_Server_CLI\Configs;
 
 
 return new Suite(
@@ -28,10 +29,12 @@ return new Suite(
 
       $HTTP_Server_CLI = new HTTP_Server_CLI(Mode: Modes::Test);
       $HTTP_Server_CLI->configure(
-         host: '0.0.0.0',
-         // ? 8098 — outside the 8081-8097 range claimed by the core E2E suites
-         port: 8098,
-         workers: 1
+         new Configs(
+            host: '0.0.0.0',
+            // ? 8098 — outside the 8081-8097 range claimed by the core E2E suites
+            port: 8098,
+            workers: 1
+         )
       );
 
       $HTTP_Server_CLI->start();
