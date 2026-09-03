@@ -3,7 +3,7 @@
 /@imports/
 composer.lock
 
-# Bootgly resources (installed by `bootgly boot --resources`)
+# Bootgly resources (installed by `bootgly kit boot --resources`)
 /storage/
 /tmp/
 
