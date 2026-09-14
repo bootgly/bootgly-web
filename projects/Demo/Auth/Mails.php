@@ -50,7 +50,7 @@ class Mails
    public static function compose (string $template, string $to, string $subject, array $data): Message
    {
       $Message = new Message;
-      $Message->from = self::option('From', 'no-reply@auth.localhost');
+      $Message->from = self::read('From', 'no-reply@auth.localhost');
       $Message->to = $to;
       $Message->subject = $subject;
       // ! Plain-text fallback always carries the action link.
@@ -68,14 +68,14 @@ class Mails
    {
       try {
          // ?: Zero-setup file sink
-         if (self::option('Host') === '') {
+         if (self::read('Host') === '') {
             self::sink($Message);
 
             return;
          }
 
          // ?: Queued delivery — the `mail` queue worker sends it
-         if (self::option('Queue', false) === true) {
+         if (self::read('Queue', false) === true) {
             Mail::dispatch($Message);
 
             return;
@@ -110,7 +110,7 @@ class Mails
    /**
     * Read one value from the `mail` config scope.
     */
-   private static function option (string $field, mixed $default = ''): mixed
+   private static function read (string $field, mixed $default = ''): mixed
    {
       $Config = BOOTGLY_PROJECT->Configs?->get('mail');
       // ?

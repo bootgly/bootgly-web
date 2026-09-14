@@ -37,7 +37,7 @@ class Resets extends Controller
       // ?: GET renders the forgot-password form
       if ($Request->method === 'GET') {
          return $this->render('auth/forgot', [
-            'token' => $this->token($Request),
+            'token' => $this->mask($Request),
             ...$this->pull($Request)
          ]);
       }
@@ -61,17 +61,17 @@ class Resets extends Controller
       // @ Mint + send only for existing accounts — the response never varies
       $Identity = $this->Users->fetch($email);
       if ($Identity !== null) {
-         $ttl = (int) $this->option('Recovery', 'TTL', 3600);
-         $Token = $this->Tokens->mint($Identity->id, Purposes::Recovery, $ttl);
+         $TTL = (int) $this->read('Recovery', 'TTL', 3600);
+         $Token = $this->Tokens->mint($Identity->id, Purposes::Recovery, $TTL);
 
-         $URL = (string) $this->option('', 'URL', 'http://localhost:8087');
+         $URL = (string) $this->read('', 'URL', 'http://localhost:8087');
          $link = "{$URL}/reset/" . str_replace('.', '/', $Token->value);
 
          Mails::deliver(Mails::compose(
             template: 'recovery',
             to: $email,
             subject: 'Reset your password',
-            data: ['URL' => $link, 'TTL' => $ttl]
+            data: ['URL' => $link, 'TTL' => $TTL]
          ));
       }
 
@@ -100,7 +100,7 @@ class Resets extends Controller
 
       // :
       return $this->render('auth/reset', [
-         'token' => $this->token($Request),
+         'token' => $this->mask($Request),
          'selector' => $selector,
          'verifier' => $verifier,
          ...$this->pull($Request)

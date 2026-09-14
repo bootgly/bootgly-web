@@ -13,6 +13,13 @@ parameters:
       -
          message: '#.*BOOTGLY_PROJECT not found\.#'
          identifier: constant.notFound
+      -
+         # Named-arguments guard slot: `$Named` is deliberately never read — it
+         # exists so a positional call lands on a type no value can satisfy.
+         message: '#has an unused parameter \$Named\.#'
+         identifier: constructor.unusedParameter
+         paths:
+            - ../Web/App/Configs.php
       - identifier: property.uninitializedReadonly
       - identifier: property.private
       - identifier: property.protected

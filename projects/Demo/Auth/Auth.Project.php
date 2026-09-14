@@ -20,6 +20,7 @@ use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\Authentication\Remember
 use Bootgly\WPI\Queues;
 use Bootgly\WPI\Services\Mail;
 use Web\App;
+use Web\App\Configs;
 
 
 return new Project(
@@ -82,17 +83,17 @@ return new Project(
       });
 
       $App
-         ->configure(
+         ->configure(new Configs(
             port: getenv('PORT') ? (int) getenv('PORT') : 8087,
             // ! Single worker — the demo SQLite file keeps writes contention-free
             workers: 1,
             // ? Auto-TLS (automatic HTTPS via Let's Encrypt) — set your domain and uncomment:
-            // secure: new AutoTLS(
+            // AutoTLS: new AutoTLS(
             //    domains: ['example.com'],
             //    email: 'admin@example.com',
             //    // staging: true, // Let's Encrypt staging CA while testing
             // ),
-         )
+         ))
          ->load(__DIR__ . '/router')
          ->start();
    }

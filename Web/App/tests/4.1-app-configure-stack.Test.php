@@ -37,13 +37,21 @@ return new Test(
          description: 'Default stack: SecureHeaders, RequestId, BodyParser, CSRF'
       );
 
-      // @ configure(middlewares:) replaces the stack wholesale
+      // @ configure(new Configs(Middlewares:)) replaces the stack wholesale
       $CSRF = new CSRF;
-      $Returned = $App->configure(port: 8098, workers: 1, middlewares: [$CSRF]);
+      $Returned = $App->configure(new Configs(port: 8098, workers: 1, Middlewares: [$CSRF]));
 
       yield assert(
          assertion: $Returned === $App && $App->Middlewares === [$CSRF],
          description: 'configure() is chainable and replaces the middleware stack wholesale'
+      );
+
+      // @ A Configs without Middlewares keeps the stack in place
+      $App->configure(new Configs(port: 8098, workers: 1));
+
+      yield assert(
+         assertion: $App->Middlewares === [$CSRF],
+         description: 'Middlewares left null keeps the current stack'
       );
 
       // @ start() without a loaded router fails loud

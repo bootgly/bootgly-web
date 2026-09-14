@@ -26,7 +26,7 @@ class Verifications extends Controller
       $this->boot($Response);
 
       // ! Authenticated by the route guard.
-      $user = (string) $this->user($Request);
+      $user = (string) $this->identify($Request);
 
       // @ Load the account state
       $Result = $Response->Database->fetch(
@@ -69,7 +69,7 @@ class Verifications extends Controller
 
       // @ Single-use redeem
       $user = $this->Tokens->redeem($token, Purposes::Verification);
-      $home = $this->user($Request) !== null ? '/account' : '/login';
+      $home = $this->identify($Request) !== null ? '/account' : '/login';
       // ?
       if ($user === null) {
          $this->flash($Request, 'This verification link is invalid or has expired.');

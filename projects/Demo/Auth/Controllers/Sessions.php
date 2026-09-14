@@ -30,14 +30,14 @@ class Sessions extends Controller
    public function create (Request $Request, Response $Response): Response
    {
       // ?: Already signed in
-      if ($this->user($Request) !== null) {
+      if ($this->identify($Request) !== null) {
          return $this->redirect('/account');
       }
 
       // ?: GET renders the sign-in form
       if ($Request->method === 'GET') {
          return $this->render('auth/login', [
-            'token' => $this->token($Request),
+            'token' => $this->mask($Request),
             ...$this->pull($Request)
          ]);
       }

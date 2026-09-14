@@ -29,7 +29,7 @@ class Posts extends Controller
       $body = $Response->Database->paginate(Post::class);
 
       return $this->render('posts/list', [
-         'posts' => $body['items'],
+         'Posts' => $body['items'],
          'page' => $body['page'] ?? 1,
          'pages' => $body['pages'] ?? 1
       ]);
@@ -47,7 +47,7 @@ class Posts extends Controller
 
       return $this->render('posts/show', [
          'post' => $post,
-         'token' => $this->token($Request)
+         'token' => $this->mask($Request)
       ]);
    }
 
@@ -55,7 +55,7 @@ class Posts extends Controller
    {
       // ?: GET renders the blank form
       if ($Request->method === 'GET') {
-         return $this->render('posts/create', ['token' => $this->token($Request)]);
+         return $this->render('posts/create', ['token' => $this->mask($Request)]);
       }
 
       // @ POST persists
@@ -91,7 +91,7 @@ class Posts extends Controller
 
       return $this->render('posts/edit', [
          'post' => $post,
-         'token' => $this->token($Request)
+         'token' => $this->mask($Request)
       ]);
    }
 
@@ -162,7 +162,7 @@ class Posts extends Controller
    /**
     * Per-render masked CSRF token (BREACH mitigation) for form fields.
     */
-   private function token (Request $Request): string
+   private function mask (Request $Request): string
    {
       // :
       return CSRF::mask((string) $Request->Session->get('_csrf_token', ''));

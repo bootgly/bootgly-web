@@ -20,6 +20,7 @@ use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\RequestId;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\SecureHeaders;
 use Web\API\Problems;
 use Web\App;
+use Web\App\Configs;
 
 
 return new Project(
@@ -49,23 +50,23 @@ return new Project(
       });
 
       $App
-         ->configure(
+         ->configure(new Configs(
             port: getenv('PORT') ? (int) getenv('PORT') : 8090,
             // ! Single worker — the demo SQLite file keeps writes contention-free
             workers: 1,
             // ? Auto-TLS (automatic HTTPS via Let's Encrypt) — set your domain and uncomment:
-            // secure: new AutoTLS(
+            // AutoTLS: new AutoTLS(
             //    domains: ['example.com'],
             //    email: 'admin@example.com',
             //    // staging: true, // Let's Encrypt staging CA while testing
             // ),
-            middlewares: [
+            Middlewares: [
                new SecureHeaders,
                new RequestId,
                new BodyParser,
                new Problems
             ]
-         )
+         ))
          ->load(__DIR__ . '/router')
          ->start();
    }

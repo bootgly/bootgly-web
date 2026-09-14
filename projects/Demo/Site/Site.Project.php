@@ -15,6 +15,7 @@ use Bootgly\WPI\Nodes\HTTP_Server_CLI\AutoTLS;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\RequestId;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Middlewares\SecureHeaders;
 use Web\App;
+use Web\App\Configs;
 
 
 return new Project(
@@ -36,21 +37,21 @@ return new Project(
       });
 
       $App
-         ->configure(
+         ->configure(new Configs(
             port: getenv('PORT') ? (int) getenv('PORT') : 8088,
             workers: 2,
             // ? Auto-TLS (automatic HTTPS via Let's Encrypt) — set your domain and uncomment:
-            // secure: new AutoTLS(
+            // AutoTLS: new AutoTLS(
             //    domains: ['example.com'],
             //    email: 'admin@example.com',
             //    // staging: true, // Let's Encrypt staging CA while testing
             // ),
             // ! Stateless landing — no forms, so no BodyParser/CSRF needed
-            middlewares: [
+            Middlewares: [
                new SecureHeaders,
                new RequestId
             ]
-         )
+         ))
          ->load(__DIR__ . '/router')
          ->start();
    }

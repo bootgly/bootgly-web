@@ -30,7 +30,7 @@ class Passwords extends Controller
    {
       // :
       return $this->render('auth/password', [
-         'token' => $this->token($Request),
+         'token' => $this->mask($Request),
          ...$this->pull($Request)
       ]);
    }
@@ -43,7 +43,7 @@ class Passwords extends Controller
       $this->boot($Response);
 
       // ! Authenticated by the route guard.
-      $user = (string) $this->user($Request);
+      $user = (string) $this->identify($Request);
 
       $current = (string) ($Request->fields['current'] ?? '');
       $password = (string) ($Request->fields['password'] ?? '');

@@ -19,5 +19,6 @@ return new Suite(
       '2.2-controllers-map-only-except',
       '3.1-views-share-apply',
       '4.1-app-configure-stack',
+      '4.2-app-configure-configs',
    ]
 );

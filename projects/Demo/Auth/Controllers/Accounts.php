@@ -23,7 +23,7 @@ class Accounts extends Controller
    public function show (Request $Request, Response $Response): Response
    {
       // ! Authenticated by the route guard.
-      $user = (string) $this->user($Request);
+      $user = (string) $this->identify($Request);
 
       // @ Load the account state
       $Result = $Response->Database->fetch(
@@ -43,7 +43,7 @@ class Accounts extends Controller
       return $this->render('account/show', [
          'email' => (string) $row['email'],
          'verified' => $row['email_verified_at'] !== null,
-         'token' => $this->token($Request)
+         'token' => $this->mask($Request)
       ]);
    }
 }

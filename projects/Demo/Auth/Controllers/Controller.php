@@ -57,9 +57,9 @@ abstract class Controller extends Shell
    }
 
    /**
-    * Read the authenticated account id from the session.
+    * Identify the authenticated account id from the session.
     */
-   protected function user (Request $Request): null|string
+   protected function identify (Request $Request): null|string
    {
       $identity = $Request->Session->get('identity');
 
@@ -70,7 +70,7 @@ abstract class Controller extends Shell
    /**
     * Per-render masked CSRF token (BREACH mitigation) for form fields.
     */
-   protected function token (Request $Request): string
+   protected function mask (Request $Request): string
    {
       // :
       return CSRF::mask((string) $Request->Session->get('_csrf_token', ''));
@@ -118,24 +118,24 @@ abstract class Controller extends Shell
     */
    protected function notify (string $user, string $email): void
    {
-      $ttl = (int) $this->option('Verification', 'TTL', 86400);
-      $Token = $this->Tokens->mint($user, Purposes::Verification, $ttl);
+      $TTL = (int) $this->read('Verification', 'TTL', 86400);
+      $Token = $this->Tokens->mint($user, Purposes::Verification, $TTL);
 
-      $URL = (string) $this->option('', 'URL', 'http://localhost:8087');
+      $URL = (string) $this->read('', 'URL', 'http://localhost:8087');
       $link = "{$URL}/verify/" . str_replace('.', '/', $Token->value);
 
       Mails::deliver(Mails::compose(
          template: 'verification',
          to: $email,
          subject: 'Verify your e-mail',
-         data: ['URL' => $link, 'TTL' => $ttl]
+         data: ['URL' => $link, 'TTL' => $TTL]
       ));
    }
 
    /**
     * Read one value from the `auth` config scope.
     */
-   protected function option (string $section, string $field, mixed $default): mixed
+   protected function read (string $section, string $field, mixed $default): mixed
    {
       $Config = BOOTGLY_PROJECT->Configs?->get('auth');
       // ?
