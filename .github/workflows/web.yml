@@ -1,0 +1,87 @@
+name: Bootgly Web (test)
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+    paths-ignore:
+      - '**/README.md'
+
+jobs:
+  test:
+    runs-on: ubuntu-24.04
+
+    steps:
+      -
+        name: Checkout the Web platform
+        uses: actions/checkout@v5
+        with:
+          path: bootgly-web
+      -
+        # The `bootgly` binary boots the framework from `vendor/autoload.php`
+        # or, when there is none, from the sibling `../bootgly/autoboot.php`.
+        # Checking the framework out beside the platform is what makes this
+        # lane composer-free, exactly like the framework's own lane.
+        name: Checkout the Bootgly framework beside it
+        uses: actions/checkout@v5
+        with:
+          repository: bootgly/bootgly
+          ref: main
+          path: bootgly
+      -
+        name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          ini-file: 'development'
+          ini-values: disable_functions=""
+          extensions: mbstring, pcntl
+      -
+        name: Run Bootgly Lint command
+        working-directory: bootgly-web
+        run: |
+          # The four style rules CLAUDE.md pins down, in check mode over the
+          # platform tree: every submodule runs, and any issue fails the lane.
+          # A path that matches nothing reports `scanned: 0` and fails too.
+          status=0
+          for submodule in imports nullables promotions methods; do
+            php bootgly lint "$submodule" Web/ || status=1
+          done
+          exit "$status"
+      -
+        name: Run Bootgly Test command
+        working-directory: bootgly-web
+        env:
+          BOOTGLY_TEST_TRACE: 1
+        run: |
+          set +e
+          started=$SECONDS
+          # A test child that signals its whole process group reaches `timeout`
+          # when both share one; `timeout` then treats the stray SIGTERM as its
+          # own and SIGKILLs the run --kill-after seconds later. The runner gets
+          # a session of its own inside the budget, so a group signal raised by
+          # any descendant stops at the runner. The status is recorded by the
+          # inner shell because setsid does not relay a signal death.
+          STATUS="$RUNNER_TEMP/bootgly-web-test.status"
+          rm -f "$STATUS"
+          STATUS="$STATUS" setsid --wait bash -c \
+            'timeout --signal=TERM --kill-after=30 300 setsid --wait php bootgly test; echo $? > "$STATUS"'
+          code=$(cat "$STATUS" 2>/dev/null)
+          if [ -z "$code" ]; then
+            echo '::error::the run session was killed from the outside — no status recorded'
+            code=137
+          fi
+          elapsed=$(( SECONDS - started ))
+          set -e
+          if [ "$code" -ne 0 ]; then
+            echo "::error::bootgly test exited ${code} after ${elapsed}s"
+            if [ "$code" -eq 124 ]; then
+              echo '::error::the 300s budget expired — the run stalled'
+            elif [ "$code" -gt 128 ]; then
+              echo "::error::killed by signal $(( code - 128 )) — not the budget"
+            fi
+            ps auxf || true
+            ss -tlnp || true
+          fi
+          exit "$code"
