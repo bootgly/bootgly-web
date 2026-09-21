@@ -1,6 +1,5 @@
 {
    "name": "bootgly/bootgly-web",
-   "version": "0.1.0-alpha",
    "type": "library",
    "description": "The Bootgly Web bootable.",
    "license": "MIT",
@@ -26,7 +25,7 @@
       ]
    },
    "require": {
-      "bootgly/bootgly": ">=0.23 <1.0 || dev-main"
+      "bootgly/bootgly": "^1.0 || dev-main"
    },
    "require-dev": {
       "phpstan/phpstan": "^2.1"
