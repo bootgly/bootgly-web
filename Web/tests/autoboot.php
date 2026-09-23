@@ -15,5 +15,6 @@ return new Suite(
    suiteName: __NAMESPACE__,
    tests: [
       '1.1-web-autoboot',
+      '1.2-web-agent-skills',
    ]
 );
