@@ -21,7 +21,7 @@ if (defined('WEB_WORKING_BASE') === false) {
    define('WEB_WORKING_DIR', WEB_ROOT_DIR);
 }
 
-define('WEB_VERSION', '1.0.5');
+define('WEB_VERSION', '1.0.6');
 
 // ! Bootables ([0-9]) || (-[a-z]) || ([0-9]-[a-z])
 // -- nothing --
