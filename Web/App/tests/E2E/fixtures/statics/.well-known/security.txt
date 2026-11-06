@@ -1,0 +1,2 @@
+Contact: mailto:security@example.com
+# statics-security-txt

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+# spa-fixture-robots

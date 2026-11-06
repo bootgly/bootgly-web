@@ -20,5 +20,6 @@ return new Suite(
       '3.1-views-share-apply',
       '4.1-app-configure-stack',
       '4.2-app-configure-configs',
+      '5.1-files-resolve-types',
    ]
 );

@@ -11,15 +11,7 @@
 namespace Web\App;
 
 
-use const BOOTGLY_PROJECT;
-use const PATHINFO_EXTENSION;
-use function pathinfo;
-use function str_contains;
-use function strtolower;
-
 use const Bootgly\WPI;
-use Bootgly\ABI\Code\__String\Path;
-use Bootgly\ABI\IO\FS\File;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Request;
 use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response;
 
@@ -32,52 +24,36 @@ use Bootgly\WPI\Nodes\HTTP_Server_CLI\Response;
  *
  * Register it on a catch-all param route:
  *
- *   yield $Router->route('/statics/:file*', new Statics, GET);
+ *   yield $Router->route('/statics/:file*', new Statics, [GET, HEAD]);
  *
- * Files resolve inside the project `statics/` jail (path-normalized and
- * base-contained); unknown extensions stay `application/octet-stream`.
+ * Files resolve inside the project `statics/` jail through `Files`
+ * (percent-decoded once, path-normalized and base-contained); dotfiles
+ * (but `.well-known/`), PHP sources — a symlink judged by its target — and
+ * missing files answer 404; unknown extensions stay
+ * `application/octet-stream`. Each file is read whole into memory.
  */
 class Statics
 {
    // * Config
    /** Project directory (relative to the project root) that jails the assets. */
-   public private(set) string $path;
+   public string $path {
+      get => $this->Files->path;
+   }
    /** Route param carrying the requested file (`:file*` by convention). */
    public private(set) string $param;
    /** Cache-Control header applied to every served asset. */
    public private(set) string $cache;
 
    // * Metadata
-   /** @var array<string,string> */
-   private const array TYPES = [
-      'avif' => 'image/avif',
-      'css' => 'text/css; charset=UTF-8',
-      'gif' => 'image/gif',
-      'htm' => 'text/html; charset=UTF-8',
-      'html' => 'text/html; charset=UTF-8',
-      'ico' => 'image/x-icon',
-      'jpeg' => 'image/jpeg',
-      'jpg' => 'image/jpeg',
-      'js' => 'text/javascript; charset=UTF-8',
-      'json' => 'application/json',
-      'map' => 'application/json',
-      'mjs' => 'text/javascript; charset=UTF-8',
-      'mp4' => 'video/mp4',
-      'otf' => 'font/otf',
-      'pdf' => 'application/pdf',
-      'png' => 'image/png',
-      'svg' => 'image/svg+xml',
-      'ttf' => 'font/ttf',
-      'txt' => 'text/plain; charset=UTF-8',
-      'wasm' => 'application/wasm',
-      'webm' => 'video/webm',
-      'webp' => 'image/webp',
-      'woff' => 'font/woff',
-      'woff2' => 'font/woff2',
-      'xml' => 'application/xml; charset=UTF-8'
-   ];
+   /** The jailed file server over `path`. */
+   public private(set) Files $Files;
 
 
+   /**
+    * @param string $path Project directory (relative to the project root) that jails the assets.
+    * @param string $param Route param carrying the requested file.
+    * @param string $cache Cache-Control header applied to every served asset.
+    */
    public function __construct (
       string $path = 'statics',
       string $param = 'file',
@@ -85,13 +61,15 @@ class Statics
    )
    {
       // * Config
-      $this->path = $path;
       $this->param = $param;
       $this->cache = $cache;
+
+      // * Metadata
+      $this->Files = new Files($path);
    }
 
    /**
-    * Serve the routed asset inline.
+    * Serve the routed asset inline, or answer 404.
     *
     * @param Request $Request
     * @param Response $Response
@@ -99,35 +77,22 @@ class Statics
    public function __invoke (object $Request, object $Response): object
    {
       // ! Routed file (catch-all param)
-      $file = (string) WPI->Router->Route->Params->{$this->param};
+      $file = $this->Files->resolve((string) WPI->Router->Route->Params->{$this->param});
 
-      // ? Reject empty, null bytes and absolute paths before normalizing
-      if ($file === '' || str_contains($file, "\0") === true || $file[0] === '/') {
+      // ? Refused: empty, null byte, absolute, the jail itself, dotfile
+      if ($file === null) {
          return $Response(code: 404);
       }
-
-      // ! Jail — normalized path, contained in the project assets base
-      $base = BOOTGLY_PROJECT->path . "{$this->path}/";
-      $File = new File($base . Path::normalize($file), base: $base);
-
-      // ?
-      if ($File->readable === false) {
-         return $Response(code: 404);
-      }
-      $contents = $File->contents;
-      if ($contents === false) {
-         return $Response(code: 404);
-      }
-
-      // ! Media type by extension — unknown types stay generic (nosniff-safe)
-      $extension = strtolower(pathinfo($File->file, PATHINFO_EXTENSION));
-      $type = self::TYPES[$extension] ?? 'application/octet-stream';
 
       // @
-      $Response->Header->set('Content-Type', $type);
-      $Response->Header->set('Cache-Control', $this->cache);
+      $Served = $this->Files->serve($file, $Response, $this->cache);
+
+      // ?: Missing, unreadable or PHP source
+      if ($Served === false) {
+         return $Response(code: 404);
+      }
 
       // :
-      return $Response->send($contents);
+      return $Served;
    }
 }
