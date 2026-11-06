@@ -15,10 +15,13 @@ return new Suites(
       'Web/App/tests/E2E/',
       // ? Auth demo E2E (session/cookie flows over the real wire)
       'projects/Demo/Auth/tests/E2E/',
+      // ? SPA demo API E2E (JSON API over the real wire)
+      'projects/Demo/SPA/tests/E2E/',
       // ! Web projects — example signature suites (kit import guide)
       'projects/Demo/Blog/tests/project/',
       'projects/Demo/Chat/tests/project/',
       'projects/Demo/Site/tests/project/',
       'projects/Demo/Tasks/tests/project/',
+      'projects/Demo/SPA/tests/project/',
    ]
 );

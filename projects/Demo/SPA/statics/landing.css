@@ -1,0 +1,72 @@
+:root {
+   color-scheme: light dark;
+   --fg: #1d2330;
+   --bg: #f7f8fa;
+   --card: #ffffff;
+   --line: #d9dde5;
+   --muted: #5d6677;
+}
+
+@media (prefers-color-scheme: dark) {
+   :root {
+      --fg: #e6e9ef;
+      --bg: #12151b;
+      --card: #1b2029;
+      --line: #2c3340;
+      --muted: #9aa3b2;
+   }
+}
+
+body {
+   margin: 0;
+   font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+   color: var(--fg);
+   background: var(--bg);
+}
+
+main {
+   max-width: 720px;
+   margin: 0 auto;
+   padding: 48px 16px;
+}
+
+code {
+   font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+   font-size: 0.9em;
+}
+
+a {
+   color: inherit;
+}
+
+.cards {
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+   gap: 16px;
+   margin: 32px 0;
+}
+
+.card {
+   padding: 20px;
+   background: var(--card);
+   border: 1px solid var(--line);
+   border-top: 4px solid var(--line);
+   border-radius: 8px;
+}
+
+.card.react {
+   border-top-color: #149eca;
+}
+
+.card.vue {
+   border-top-color: #42b883;
+}
+
+.card h2 {
+   margin: 0 0 8px;
+}
+
+.missing,
+.hint {
+   color: var(--muted);
+}

@@ -15,7 +15,7 @@ Web platform package (`<kit>/Web/`) ships it; `kit boot` lays it down while that
 
 **Shipped examples** (imported into `projects/Demo/`, originals in `<kit>/Web/projects/Demo/`): `Blog` (MVC CRUD
 and CSRF forms), `Site` (pages via `Action`), `Tasks` (REST and JWT), `Auth` (sessions, guards, HTTP E2E tests),
-`Chat` (WebSocket). Copy one (`bootgly projects create MyBlog --from=Demo/Blog --yes`) and rename its namespace first.
+`Chat` (WebSocket), `SPA` (React and Vue Vite builds served by `Web\App\SPA` over a JSON API). Copy one (`bootgly projects create MyBlog --from=Demo/Blog --yes`) and rename its namespace first.
 
 ## 1. Know what comes from where
 

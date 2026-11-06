@@ -1,0 +1,14 @@
+{
+  "name": "bootgly-demo-spa",
+  "private": true,
+  "description": "Bootgly SPA demo — the React and Vue frontends served by Web\\App\\SPA",
+  "workspaces": [
+    "frontends/react",
+    "frontends/vue"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "dev:react": "npm run dev --workspace=frontends/react",
+    "dev:vue": "npm run dev --workspace=frontends/vue"
+  }
+}

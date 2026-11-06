@@ -18,5 +18,6 @@ return [
    'Demo/Blog'  => ['interfaces' => ['WPI']],
    'Demo/Chat'  => ['interfaces' => ['WPI']],
    'Demo/Site'  => ['interfaces' => ['WPI']],
+   'Demo/SPA'   => ['interfaces' => ['WPI']],
    'Demo/Tasks' => ['interfaces' => ['WPI']],
 ];

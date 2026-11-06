@@ -1,0 +1,6 @@
+# Dependencies and the Vite builds — `npm install && npm run build` makes them
+node_modules/
+builds/
+
+# The SQLite database and its migration/seed locks — created at boot
+database/*.sqlite*
