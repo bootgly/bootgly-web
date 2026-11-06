@@ -5,6 +5,7 @@
 
 
 use Bootgly\ACI\Tests\Suite\Test;
+use Bootgly\API\Platform;
 use Web\API;
 
 
@@ -25,6 +26,26 @@ return new Test(
       yield assert(
          assertion: Web instanceof Web,
          description: 'The Web constant holds the Web bootable'
+      );
+      yield assert(
+         assertion: Web instanceof Platform,
+         description: 'The Web bootable implements the Bootgly\API\Platform contract'
+      );
+
+      // @ Included after Bootgly (Composer's `files` order): the root is mounted all the same
+      $Process = proc_open(
+         [PHP_BINARY, '-r', 'require $argv[1]; require $argv[2]; echo json_encode(defined("Web") && Web instanceof Bootgly\API\Platform);', '--', BOOTGLY_ROOT_DIR . 'autoboot.php', WEB_ROOT_DIR . 'autoboot.php'],
+         [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
+         $Pipes
+      );
+      $late = (string) stream_get_contents($Pipes[1]);
+      fclose($Pipes[1]);
+      fclose($Pipes[2]);
+      proc_close($Process);
+
+      yield assert(
+         assertion: $late === 'true',
+         description: "The Web root is mounted when its autoboot.php runs after Bootgly's (got '{$late}')"
       );
 
       // @ Double boot guarded

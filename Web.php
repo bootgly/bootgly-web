@@ -12,7 +12,10 @@
 // raise "use statement with non-compound name has no effect").
 
 
-class Web
+use Bootgly\API\Platform;
+
+
+class Web implements Platform
 {
    // * Config
    // ...
