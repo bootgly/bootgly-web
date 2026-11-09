@@ -46,7 +46,7 @@ return new Test(
       }
 
       // ? Theft clears the presented remember value.
-      if (State::cookie($response, 'remember') !== '' || str_contains($response, 'Max-Age=0') === false) {
+      if (State::extract($response, 'remember') !== '' || str_contains($response, 'Max-Age=0') === false) {
          return 'aged remember replay did not clear the remember cookie';
       }
 

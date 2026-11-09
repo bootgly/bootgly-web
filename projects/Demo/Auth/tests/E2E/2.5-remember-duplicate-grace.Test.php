@@ -35,7 +35,7 @@ return new Test(
 
       // ! Benign grace never clears the caller's cookie; a successful sibling
       //   request may already have delivered the current generation elsewhere.
-      if (State::cookie($response, 'remember') !== null || str_contains($response, 'Max-Age=0') === true) {
+      if (State::extract($response, 'remember') !== null || str_contains($response, 'Max-Age=0') === true) {
          return 'remember duplicate cleared the cookie during rotation grace';
       }
 

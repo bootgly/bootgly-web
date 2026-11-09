@@ -106,7 +106,7 @@ final class State
    /**
     * Read one Set-Cookie value from a raw response ('' when absent).
     */
-   public static function cookie (string $response, string $name): null|string
+   public static function extract (string $response, string $name): null|string
    {
       // ?
       if (preg_match("#Set-Cookie: {$name}=([^;\r\n]*)#", $response, $match) !== 1) {
@@ -129,7 +129,7 @@ final class State
       }
 
       // ?: Remember cookie — only non-empty values (clears are asserted apart)
-      $remember = self::cookie($response, 'remember');
+      $remember = self::extract($response, 'remember');
       if ($remember !== null && $remember !== '') {
          self::$remember = $remember;
       }
