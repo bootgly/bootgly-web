@@ -206,7 +206,12 @@ class App
             health: $AppConfigs->health,
             maxConnections: $AppConfigs->maxConnections,
             maxConnectionsPerIP: $AppConfigs->maxConnectionsPerIP,
-            connectionIdleTimeout: $AppConfigs->connectionIdleTimeout
+            headroom: $AppConfigs->headroom,
+            connectionIdleTimeout: $AppConfigs->connectionIdleTimeout,
+            maxWorkerPendingBytes: $AppConfigs->maxWorkerPendingBytes,
+            maxRequests: $AppConfigs->maxRequests,
+            jitter: $AppConfigs->jitter,
+            maxMemory: $AppConfigs->maxMemory
          ),
          new ResponseConfigs(
             Resources: $Resources === [] ? null : $Resources,

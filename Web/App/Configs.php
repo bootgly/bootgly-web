@@ -69,7 +69,12 @@ class Configs extends ServerConfigs
     * @param null|string $health Health endpoint path (`'/health'` by default); `null` disables it.
     * @param null|int $maxConnections Maximum established connections per worker.
     * @param null|int $maxConnectionsPerIP Maximum established connections per client IP.
+    * @param null|int $headroom Selector entries each worker keeps free for its own dependency I/O.
     * @param null|int $connectionIdleTimeout Seconds of transport silence before a connection is closed.
+    * @param null|int $maxWorkerPendingBytes Worker memory budget for unfinished inbound and outbound bytes.
+    * @param int $maxRequests Dispatches after which a worker recycles (`0` = never).
+    * @param float $jitter Spread of each worker's recycling limit, a fraction from `0` to `1`.
+    * @param int|string $maxMemory Memory ceiling of a worker in bytes, or a size such as `"512M"`; `0` = none.
     * @param null|array<array-key,mixed> $Middlewares Replaces the default middleware stack wholesale — every entry must be a Middleware.
     * @param null|array<array-key,mixed> $Resources Extra response resources, by name — every value must be a Closure factory.
     * @param null|int|float $deferredTimeout Seconds a deferred response may take before it is cancelled.
@@ -91,7 +96,12 @@ class Configs extends ServerConfigs
       null|string $health = '/health',
       null|int $maxConnections = null,
       null|int $maxConnectionsPerIP = null,
+      null|int $headroom = null,
       null|int $connectionIdleTimeout = null,
+      null|int $maxWorkerPendingBytes = null,
+      int $maxRequests = 0,
+      float $jitter = 0.1,
+      int|string $maxMemory = 0,
       null|array $Middlewares = null,
       null|array $Resources = null,
       null|int|float $deferredTimeout = null
@@ -139,7 +149,12 @@ class Configs extends ServerConfigs
          health: $health,
          maxConnections: $maxConnections,
          maxConnectionsPerIP: $maxConnectionsPerIP,
-         connectionIdleTimeout: $connectionIdleTimeout
+         headroom: $headroom,
+         connectionIdleTimeout: $connectionIdleTimeout,
+         maxWorkerPendingBytes: $maxWorkerPendingBytes,
+         maxRequests: $maxRequests,
+         jitter: $jitter,
+         maxMemory: $maxMemory
       );
 
       // * Config

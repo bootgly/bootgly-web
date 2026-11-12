@@ -21,23 +21,23 @@ The **opinionated web layer** over `Bootgly\WPI`: WPI stays deliberately low-lev
 
 ## Getting started
 
-Use the **canonical installer** — it sets up a [bootgly.kit](https://github.com/bootgly/bootgly.kit) workspace, where the platforms are unified, and asks which ones to enable (pick **Web**):
+Use the **canonical installer** — it sets up a [bootgly.kit](https://github.com/bootgly/bootgly.kit) workspace, where the platforms are unified. Every platform (Console and **Web**) comes set up, with no question asked:
 
 ```bash
 curl -fsSL https://bootgly.com/install | bash
 ```
 
-From the kit, the project wizard imports this platform's demo projects (**Import projects from Platforms → Web**):
+The wizard's first run imports every demo project of this platform into `projects/Demo/`, as a living guide:
 
 ```bash
-php bootgly projects create
+php bootgly projects list
 ```
 
 > ⚠️ Using this repository directly is **discouraged** — `bootgly.kit` is the starting point: it is where the Bootgly core and the platforms are mounted and booted together. See [Getting started](https://docs.bootgly.com/guide/getting-started). Cloning `bootgly-web` standalone is only meant for developing the platform itself.
 
 ## Modules
 
-- **`Web\App`** — the MVC application shell: an opinionated boot of the canonical HTTP server with a default middleware stack (SecureHeaders, RequestId, BodyParser, CSRF), `Controller` base + lazy dispatch (fresh instance per request), `Controllers::map()` resource routing (HTML-form-aware), `Statics` (inline assets with the right media type) and `Views` conventions (default layout + shared exports).
+- **`Web\App`** — the MVC application shell: an opinionated boot of the canonical HTTP server with a default middleware stack (SecureHeaders, RequestId, BodyParser, CSRF), `Controller` base + lazy dispatch (fresh instance per request), `Controllers::map()` resource routing (HTML-form-aware), `Statics` (inline assets with the right media type), `SPA` (single-page-app handler with history-API fallback), `Files` (jailed, typed and cached file resolution behind `Statics` and `SPA`) and `Views` conventions (default layout + shared exports).
 - **`Web\API`** — the REST shell: `Action` (invokable controller-action dispatcher), `Routes::map()` REST resource routing, `Problem`/`Problems` (RFC 9457 problem details as throwable + middleware error boundary) and `Resource` transformers (with core pagination envelope reuse).
 
 ## Demo projects (exportable)
@@ -48,12 +48,13 @@ php bootgly projects create
 | `Blog`  | 8080 | Full MVC loop: controllers, ORM models, views, Session flash + masked CSRF forms, SQLite (zero setup) |
 | `Chat`  | 8085 | Realtime rooms over the WebSocket server — the client page is served on the same port |
 | `Site`  | 8088 | Landing pages: controller-dispatched views, layouts, inline statics, no database |
+| `SPA`   | 8092 | Single-page apps: React and Vue Vite builds served with history-API fallback over a JSON API, SQLite (zero setup) |
 | `Tasks` | 8090 | REST API: resources, problem+json, JWT-protected mutations, pagination (`X-Total-Count`/`Link`) |
 
-After importing them in the kit:
+Once imported in the kit:
 
 ```bash
-php bootgly project Blog start
+php bootgly project Demo/Blog start
 ```
 
 ## Developing the platform
@@ -63,7 +64,7 @@ Only for working on `bootgly-web` itself (with the `bootgly` core as a sibling c
 ```bash
 ./bootgly test                                # test suites
 vendor/bin/phpstan analyse -c @/phpstan.neon  # static analysis
-./bootgly project Blog start -f               # run a demo in foreground
+./bootgly project Demo/Blog start -f          # run a demo in foreground
 ```
 
 [Documentation][PROJECT_DOCS] — see the *Web Platform* guide and the *Web* manual pages.

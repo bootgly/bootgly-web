@@ -42,6 +42,11 @@ return new Test(
       $oldMaxConnections = HTTP_Server_CLI::$maxConnections;
       $oldMaxConnectionsPerIP = HTTP_Server_CLI::$maxConnectionsPerIP;
       $oldConnectionIdleTimeout = HTTP_Server_CLI::$connectionIdleTimeout;
+      $oldHeadroom = TCP_Server_CLI::$headroom;
+      $oldMaxWorkerPendingBytes = TCP_Server_CLI::$maxWorkerPendingBytes;
+      $oldMaxRequests = TCP_Server_CLI::$maxRequests;
+      $oldJitter = TCP_Server_CLI::$jitter;
+      $oldMaxMemory = TCP_Server_CLI::$maxMemory;
       $oldDeferredTimeout = Response::$deferredTimeout;
       $oldMaxBodySize = Request::$maxBodySize;
       $OldProtocols = TCP_Server_CLI::$Protocols;
@@ -91,6 +96,11 @@ return new Test(
             maxConnections: 123,
             maxConnectionsPerIP: 45,
             connectionIdleTimeout: 67,
+            headroom: 48,
+            maxWorkerPendingBytes: 33554432,
+            maxRequests: 5000,
+            jitter: 0.25,
+            maxMemory: '256M',
             deferredTimeout: 9,
             user: 'nobody-probe',
             group: 'nogroup-probe'
@@ -104,12 +114,18 @@ return new Test(
             HTTP_Server_CLI::$enableHTTP2, HTTP_Server_CLI::$health,
             HTTP_Server_CLI::$maxConnections, HTTP_Server_CLI::$maxConnectionsPerIP, HTTP_Server_CLI::$connectionIdleTimeout,
             Response::$deferredTimeout, $user, $group,
+            TCP_Server_CLI::$headroom, TCP_Server_CLI::$maxWorkerPendingBytes,
+            TCP_Server_CLI::$maxRequests, TCP_Server_CLI::$jitter, TCP_Server_CLI::$maxMemory,
          ];
 
          yield assert(
-            assertion: $landed === ['127.0.0.1', 8097, 3, false, false, '/alive', 123, 45, 67, 9, 'nobody-probe', 'nogroup-probe'],
+            assertion: $landed === [
+               '127.0.0.1', 8097, 3, false, false, '/alive', 123, 45, 67, 9, 'nobody-probe', 'nogroup-probe',
+               48, 33554432, 5000, 0.25, 268435456,
+            ],
             description: 'host, port, workers, secure, enableHTTP2, health, maxConnections, maxConnectionsPerIP, connectionIdleTimeout, '
-               . 'deferredTimeout, user and group must all land on the server — ' . var_export($landed, true)
+               . 'deferredTimeout, user, group, headroom, maxWorkerPendingBytes, maxRequests, jitter and maxMemory '
+               . 'must all land on the server — ' . var_export($landed, true)
          );
 
          // @@ B2b) AutoTLS travels too: the server refuses, before any I/O, an
@@ -304,6 +320,11 @@ return new Test(
          HTTP_Server_CLI::$maxConnections = $oldMaxConnections;
          HTTP_Server_CLI::$maxConnectionsPerIP = $oldMaxConnectionsPerIP;
          HTTP_Server_CLI::$connectionIdleTimeout = $oldConnectionIdleTimeout;
+         TCP_Server_CLI::$headroom = $oldHeadroom;
+         TCP_Server_CLI::$maxWorkerPendingBytes = $oldMaxWorkerPendingBytes;
+         TCP_Server_CLI::$maxRequests = $oldMaxRequests;
+         TCP_Server_CLI::$jitter = $oldJitter;
+         TCP_Server_CLI::$maxMemory = $oldMaxMemory;
          Response::$deferredTimeout = $oldDeferredTimeout;
          Request::$maxBodySize = $oldMaxBodySize;
          TCP_Server_CLI::$Protocols = $OldProtocols;
