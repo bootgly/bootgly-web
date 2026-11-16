@@ -69,6 +69,11 @@ return new Test(
          );
 
          // @@ B) No Configs at all applies the platform defaults
+         // ! The selector headroom and the worker pending budget an App leaves
+         //   unset stay what the transport holds: start from what it holds in
+         //   a fresh process, whatever an earlier case left behind
+         TCP_Server_CLI::$headroom = new ReflectionProperty(TCP_Server_CLI::class, 'headroom')->getDefaultValue();
+         TCP_Server_CLI::$maxWorkerPendingBytes = new ReflectionProperty(TCP_Server_CLI::class, 'maxWorkerPendingBytes')->getDefaultValue();
          $App = new App(Mode: Modes::Test);
          $App->configure();
 
@@ -82,6 +87,17 @@ return new Test(
                && count($App->Middlewares) === 4,
             description: 'an empty configure() reaches the server with host 0.0.0.0, port 8080, workers 2 and /health — '
                . var_export([$App->Server->host, $App->Server->port, $workers, HTTP_Server_CLI::$health], true)
+         );
+
+         $defaults = [
+            TCP_Server_CLI::$headroom, TCP_Server_CLI::$maxWorkerPendingBytes,
+            TCP_Server_CLI::$maxRequests, TCP_Server_CLI::$jitter, TCP_Server_CLI::$maxMemory,
+         ];
+         $observed = var_export($defaults, true);
+
+         yield assert(
+            assertion: $defaults === [32, 67108864, 0, 0.1, 0],
+            description: "an empty configure() keeps the selector headroom (32) and the worker pending budget (64 MiB) and recycles no worker (maxRequests 0, jitter 0.1, maxMemory 0) — {$observed}"
          );
 
          // @@ B2) Every option the App Configs carries reaches the server — one

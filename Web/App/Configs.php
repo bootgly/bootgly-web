@@ -80,8 +80,11 @@ class Configs extends ServerConfigs
     * @param null|int|float $deferredTimeout Seconds a deferred response may take before it is cancelled.
     *
     * @throws InvalidArgumentException When both `secure` and `AutoTLS` are given, on a
-    *                                  stack entry that is not a Middleware, or on a
-    *                                  resource that is not a named Closure factory.
+    *                                  stack entry that is not a Middleware, on a
+    *                                  resource that is not a named Closure factory, or
+    *                                  when `maxRequests` or `maxMemory` is negative,
+    *                                  `maxMemory` is not a size, or `jitter` is outside
+    *                                  `0`–`1`.
     */
    public function __construct (
       Argument $Named = Argument::Undefined,
