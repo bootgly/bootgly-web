@@ -189,7 +189,7 @@ through `$Response->Database` as its §5 shows; to migrate and seed at start, bu
 
 ## 9. Test it
 
-List a case in a suite registered in `tests/autoboot.php` ([Testing guidelines](../../../.agents/rules/Testing_guidelines.md); the bootgly-test skill runs the loop). Test the logic behind the routes directly, and that `router/router.index.php` lists the set and `router/routes/<Name>.routes.php` returns a `Closure` — the Guestbook cookbook's `1.2-router.Test.php` does both. Full HTTP tests return a `Bootgly\WPI\Nodes\HTTP_Server_CLI\Tests\Suite\Test`: copy the suite in `projects/Demo/Auth/tests/E2E/` (original: `<kit>/Web/projects/Demo/Auth/tests/E2E/`).
+List a case in a suite registered in `tests/autoboot.php` ([Testing guidelines](../../../.agents/rules/Testing_guidelines.md); the bootgly-test skill runs the loop). Test the logic behind the routes directly, and that `router/router.index.php` lists the set and `router/routes/<Name>.routes.php` returns a `Closure` — the Guestbook cookbook's `1.2-router.Test.php` does both. Then check what the set registers: call that `Closure` on a `new Router` — `$Router->warm($routes(new Request, new Response, $Router))` — and assert over `$Router->Routes` (read-only: copy it before `end()`), one row per registration: `path` as written (`/notes/:id<int>`), `methods` (`null`: every method, as on `/*`), `Middlewares` and `Kind` (a `Bootgly\WPI\Nodes\HTTP_Server_CLI\Router\Registration\Kinds` case: `Static`, `Dynamic`, `CatchAll`, `Body`). Full HTTP tests return a `Bootgly\WPI\Nodes\HTTP_Server_CLI\Tests\Suite\Test`: copy the suite in `projects/Demo/Auth/tests/E2E/` (original: `<kit>/Web/projects/Demo/Auth/tests/E2E/`).
 
 ## Checks
 

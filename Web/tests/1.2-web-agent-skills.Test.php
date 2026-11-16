@@ -18,6 +18,7 @@ return new Test(
       $sections = [
          'Architecture_principles',
          'Coding_styles',
+         'Extensibility',
          'Naming_conventions',
          'Organizational_structures',
          'Testing_guidelines',
